@@ -646,6 +646,8 @@ public class Messages {
 
     void setMixWithOthers(@NonNull MixWithOthersMessage msg);
 
+    void setPictureInPicture();
+
     /** The codec used by AndroidVideoPlayerApi. */
     static MessageCodec<Object> getCodec() {
       return AndroidVideoPlayerApiCodec.INSTANCE;
@@ -926,6 +928,33 @@ public class Messages {
                 }
                 reply.reply(wrapped);
               });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+                new BasicMessageChannel<>(
+                        binaryMessenger,
+                        "dev.flutter.pigeon.VideoPlayerApi.setPictureInPicture",
+                        getCodec());
+        if (api != null) {
+          channel.setMessageHandler(
+                  (message, reply) -> {
+                    Map<String, Object> wrapped = new HashMap<>();
+                    try {
+                      ArrayList<Object> args = (ArrayList<Object>) message;
+                      MixWithOthersMessage msgArg = (MixWithOthersMessage) args.get(0);
+                      if (msgArg == null) {
+                        throw new NullPointerException("msgArg unexpectedly null.");
+                      }
+                      api.setMixWithOthers(msgArg);
+                      wrapped.put("result", null);
+                    } catch (Error | RuntimeException exception) {
+                      wrapped.put("error", wrapError(exception));
+                    }
+                    reply.reply(wrapped);
+                  });
         } else {
           channel.setMessageHandler(null);
         }

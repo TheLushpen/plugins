@@ -211,6 +211,12 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
     options.mixWithOthers = arg.getMixWithOthers();
   }
 
+  public void setPictureInPicture(){
+    if (Build.VERSION.SDK_INT > 24)
+        flutterState.applicationContext.enterPictureInPictureMode();
+  }
+
+
   private interface KeyForAssetFn {
     String get(String asset);
   }
