@@ -27,11 +27,12 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 /** Android platform implementation of the VideoPlayerPlugin. */
-public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
+public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, ActivityAware {
   private static final String TAG = "VideoPlayerPlugin";
   private final LongSparseArray<VideoPlayer> videoPlayers = new LongSparseArray<>();
   private FlutterState flutterState;
   private VideoPlayerOptions options = new VideoPlayerOptions();
+  private FlutterActivity activity;
 
   /** Register this with the v2 embedding for the plugin to respond to lifecycle callbacks. */
   public VideoPlayerPlugin() {}
@@ -213,7 +214,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
 
   public void setPictureInPicture(){
     if (Build.VERSION.SDK_INT > 24)
-        flutterState.applicationContext.enterPictureInPictureMode();
+        activity.enterPictureInPictureMode();
   }
 
 
@@ -253,4 +254,25 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
       AndroidVideoPlayerApi.setup(messenger, null);
     }
   }
+
+    @Override
+    public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
+        this.activity = activityPluginBinding.activity as FlutterActivity;
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        // TODO: the Activity your plugin was attached to was destroyed to change configuration.
+        // This call will be followed by onReattachedToActivityForConfigChanges().
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
+        this.activity = activityPluginBinding.activity as FlutterActivity;
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        // TODO: your plugin is no longer associated with an Activity. Clean up references.
+    }
 }
