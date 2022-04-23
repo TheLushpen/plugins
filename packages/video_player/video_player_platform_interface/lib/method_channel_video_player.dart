@@ -132,6 +132,14 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
           return VideoEvent(eventType: VideoEventType.bufferingStart);
         case 'bufferingEnd':
           return VideoEvent(eventType: VideoEventType.bufferingEnd);
+        case 'startingPiP':
+          return VideoEvent(eventType: VideoEventType.startingPiP);
+        case 'stoppedPiP':
+          return VideoEvent(eventType: VideoEventType.stoppedPiP);
+        case 'expandButtonTapPiP':
+          return VideoEvent(eventType: VideoEventType.expandButtonTapPiP);
+        case 'closeButtonTapPiP':
+          return VideoEvent(eventType: VideoEventType.closeButtonTapPiP);
         default:
           return VideoEvent(eventType: VideoEventType.unknown);
       }
@@ -148,6 +156,17 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
     return _api.setMixWithOthers(
       MixWithOthersMessage()..mixWithOthers = mixWithOthers,
     );
+  }
+
+  @override
+  Future<void> setPictureInPicture(int textureId, bool enabled, double left, double top, double width, double height) {
+    return _api.setPictureInPicture(PictureInPictureMessage()
+      ..textureId = textureId
+      ..enabled = enabled ? 1 : 0
+      ..left = left
+      ..top = top
+      ..width = width
+      ..height = height);
   }
 
   EventChannel _eventChannelFor(int textureId) {

@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class FLTPositionMessage;
 @class FLTCreateMessage;
 @class FLTMixWithOthersMessage;
+@class FLTPictureInPictureMessage;
 
 @interface FLTTextureMessage : NSObject
 /// `init` unavailable to enforce nonnull fields, see the `make` class method.
@@ -78,6 +79,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)makeWithMixWithOthers:(NSNumber *)mixWithOthers;
 @property(nonatomic, strong) NSNumber *mixWithOthers;
+@end
+
+@interface FLTPictureInPictureMessage : NSObject
+@property(nonatomic, strong, nullable) NSNumber *textureId;
+@property(nonatomic, strong, nullable) NSNumber *enabled;
+@property(nonatomic, strong, nullable) NSNumber *left;
+@property(nonatomic, strong, nullable) NSNumber *top;
+@property(nonatomic, strong, nullable) NSNumber *width;
+@property(nonatomic, strong, nullable) NSNumber *height;
 @end
 
 /// The codec used by FLTAVFoundationVideoPlayerApi.

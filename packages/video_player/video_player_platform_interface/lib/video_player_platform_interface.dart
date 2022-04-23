@@ -103,6 +103,11 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   Future<void> setMixWithOthers(bool mixWithOthers) {
     throw UnimplementedError('setMixWithOthers() has not been implemented.');
   }
+
+  /// Sets the setPictureInPictureVideo.
+  Future<void> setPictureInPicture(int textureId, bool enabled, double left, double top, double width, double height) {
+    throw UnimplementedError('setPictureInPictureVideo() has not been implemented.');
+  }
 }
 
 /// Description of the data source used to create an instance of
@@ -277,6 +282,18 @@ enum VideoEventType {
 
   /// The video stopped to buffer.
   bufferingEnd,
+
+  /// The video starting to picture in picture.
+  startingPiP,
+
+  /// The video stopped to picture in picture.
+  stoppedPiP,
+
+  /// Event when picture in picture expand button is pressed
+  expandButtonTapPiP,
+
+  /// Event when picture in picture close button is pressed
+  closeButtonTapPiP,
 
   /// An unknown event has been received.
   unknown,

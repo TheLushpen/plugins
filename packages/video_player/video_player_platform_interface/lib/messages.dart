@@ -146,6 +146,43 @@ class MixWithOthersMessage {
   }
 }
 
+
+class PictureInPictureMessage {
+  int textureId;
+  int enabled;
+  double left;
+  double top;
+  double width;
+  double height;
+
+  // ignore: unused_element
+  Map<dynamic, dynamic> _toMap() {
+    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
+    pigeonMap['textureId'] = textureId;
+    pigeonMap['enabled'] = enabled;
+    pigeonMap['left'] = left;
+    pigeonMap['top'] = top;
+    pigeonMap['width'] = width;
+    pigeonMap['height'] = height;
+    return pigeonMap;
+  }
+
+  // ignore: unused_element
+  static PictureInPictureMessage _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    if (pigeonMap == null) {
+      return null;
+    }
+    final PictureInPictureMessage result = PictureInPictureMessage();
+    result.textureId = pigeonMap['textureId'];
+    result.enabled = pigeonMap['enabled'];
+    result.left = pigeonMap['left'];
+    result.top = pigeonMap['top'];
+    result.width = pigeonMap['width'];
+    result.height = pigeonMap['height'];
+    return result;
+  }
+}
+
 class VideoPlayerApi {
   Future<void> initialize() async {
     const BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
@@ -418,6 +455,28 @@ class VideoPlayerApi {
         message: error['message'] as String?,
         details: error['details'],
       );
+    } else {
+      // noop
+    }
+  }
+
+  Future<void> setPictureInPicture(PictureInPictureMessage arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel = BasicMessageChannel<dynamic>(
+        'dev.flutter.pigeon.VideoPlayerApi.setPictureInPicture', StandardMessageCodec());
+
+    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
+    if (replyMap == null) {
+      throw PlatformException(
+          code: 'channel-error',
+          message: 'Unable to establish connection on channel.',
+          details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
     } else {
       // noop
     }
