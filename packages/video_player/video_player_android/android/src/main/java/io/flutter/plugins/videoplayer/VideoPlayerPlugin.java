@@ -6,10 +6,16 @@ package io.flutter.plugins.videoplayer;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import android.util.LongSparseArray;
+
+import androidx.annotation.NonNull;
+
 import io.flutter.FlutterInjector;
-import io.flutter.Log;
+import io.flutter.app.FlutterActivity;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugins.videoplayer.Messages.AndroidVideoPlayerApi;
@@ -255,20 +261,20 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
     }
   }
 
-    @Override
-    public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
-        this.activity = (FlutterActivity) activityPluginBinding.activity;
-    }
+  @Override
+  public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+    this.activity = (FlutterActivity) binding.getActivity();
+  }
 
-    @Override
+  @Override
     public void onDetachedFromActivityForConfigChanges() {
         // TODO: the Activity your plugin was attached to was destroyed to change configuration.
         // This call will be followed by onReattachedToActivityForConfigChanges().
     }
 
     @Override
-    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
-        this.activity = (FlutterActivity) activityPluginBinding.activity;
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+        this.activity = (FlutterActivity) binding.getActivity();
     }
 
     @Override
