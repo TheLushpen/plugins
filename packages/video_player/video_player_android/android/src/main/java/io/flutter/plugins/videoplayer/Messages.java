@@ -943,12 +943,7 @@ public class Messages {
                   (message, reply) -> {
                     Map<String, Object> wrapped = new HashMap<>();
                     try {
-                      ArrayList<Object> args = (ArrayList<Object>) message;
-                      MixWithOthersMessage msgArg = (MixWithOthersMessage) args.get(0);
-                      if (msgArg == null) {
-                        throw new NullPointerException("msgArg unexpectedly null.");
-                      }
-                      api.setMixWithOthers(msgArg);
+                      api.setPictureInPicture();
                       wrapped.put("result", null);
                     } catch (Error | RuntimeException exception) {
                       wrapped.put("error", wrapError(exception));
