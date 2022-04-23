@@ -257,7 +257,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
 
     @Override
     public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
-        this.activity = activityPluginBinding.activity as FlutterActivity;
+        this.activity = (FlutterActivity) activityPluginBinding.activity;
     }
 
     @Override
@@ -268,7 +268,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
 
     @Override
     public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
-        this.activity = activityPluginBinding.activity as FlutterActivity;
+        this.activity = (FlutterActivity) activityPluginBinding.activity;
     }
 
     @Override
