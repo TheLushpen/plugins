@@ -12,7 +12,7 @@ import android.util.LongSparseArray;
 import androidx.annotation.NonNull;
 
 import io.flutter.FlutterInjector;
-import io.flutter.app.FlutterActivity;
+import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
