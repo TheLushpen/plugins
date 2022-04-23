@@ -191,6 +191,36 @@ class MixWithOthersMessage {
   }
 }
 
+class PictureInPictureMessage {
+  final int textureId;
+  final int enabled;
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+
+  PictureInPictureMessage({
+    required this.textureId,
+    required this.enabled,
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+  });
+
+  // ignore: unused_element
+  Map<dynamic, dynamic> _toMap() {
+    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
+    pigeonMap['textureId'] = textureId;
+    pigeonMap['enabled'] = enabled;
+    pigeonMap['left'] = left;
+    pigeonMap['top'] = top;
+    pigeonMap['width'] = width;
+    pigeonMap['height'] = height;
+    return pigeonMap;
+  }
+}
+
 class _AVFoundationVideoPlayerApiCodec extends StandardMessageCodec {
   const _AVFoundationVideoPlayerApiCodec();
   @override
@@ -533,6 +563,31 @@ class AVFoundationVideoPlayerApi {
       );
     } else {
       return;
+    }
+  }
+
+  Future<void> setPictureInPicture(PictureInPictureMessage arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel = BasicMessageChannel<dynamic>(
+        'dev.flutter.pigeon.VideoPlayerApi.setPictureInPicture',
+        StandardMessageCodec());
+
+    final Map<dynamic, dynamic> replyMap =
+    await channel.send(requestMap) as Map<dynamic, dynamic>;
+    if (replyMap == null) {
+      throw PlatformException(
+          code: 'channel-error',
+          message: 'Unable to establish connection on channel.',
+          details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error =
+      replyMap['error'] as Map<dynamic, dynamic>;
+      throw PlatformException(
+          code: error['code'] as String,
+          message: error['message'] as String?,
+          details: error['details']);
+    } else {
+      // noop
     }
   }
 }

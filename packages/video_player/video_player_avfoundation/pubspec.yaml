@@ -19,7 +19,11 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  video_player_platform_interface: ">=4.2.0 <6.0.0"
+  video_player_platform_interface:
+    git:
+      url: https://github.com/TheLushpen/plugins.git
+      ref: pip
+      path: packages/video_player/video_player_platform_interface
 
 dev_dependencies:
   flutter_test:
