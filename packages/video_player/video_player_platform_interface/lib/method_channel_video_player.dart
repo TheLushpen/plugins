@@ -159,14 +159,16 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<void> setPictureInPicture(int textureId, bool enabled, double left, double top, double width, double height) {
-    return _api.setPictureInPicture(PictureInPictureMessage()
-      ..textureId = textureId
-      ..enabled = enabled ? 1 : 0
-      ..left = left
-      ..top = top
-      ..width = width
-      ..height = height);
+  Future<void> setPictureInPicture(int textureId, bool enabled, double left,
+      double top, double width, double height) {
+    return _api.setPictureInPicture(PictureInPictureMessage(
+      textureId: textureId,
+      enabled: enabled ? 1 : 0,
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+    ));
   }
 
   EventChannel _eventChannelFor(int textureId) {
