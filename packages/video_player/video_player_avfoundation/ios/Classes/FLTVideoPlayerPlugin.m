@@ -239,8 +239,11 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 
   _player = [AVPlayer playerWithPlayerItem:item];
   _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+
+  if (@available(iOS 10.0, *)) {
   // Fix start delay: https://stackoverflow.com/questions/39703808/avplayer-starts-to-reproduce-a-video-after-a-long-delay
   _player.automaticallyWaitsToMinimizeStalling = false;
+  }
 
   [self createVideoOutputAndDisplayLink:frameUpdater];
 
