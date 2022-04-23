@@ -528,7 +528,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
 
   Future<void> _setPictureInPicture(bool enabled, double left, double top,
       double width, double height) async {
-    if (!value.initialized || _isDisposed) {
+    if (!value.isInitialized || _isDisposed) {
       return;
     }
     value = value.copyWith(isShowingPIP: enabled);
