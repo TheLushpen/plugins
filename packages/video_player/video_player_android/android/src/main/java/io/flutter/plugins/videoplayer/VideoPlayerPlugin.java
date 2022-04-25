@@ -4,10 +4,14 @@
 
 package io.flutter.plugins.videoplayer;
 
+import android.app.PictureInPictureParams;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.os.Build;
 import android.util.Log;
 import android.util.LongSparseArray;
+import android.util.Rational;
 
 import androidx.annotation.NonNull;
 
@@ -34,6 +38,9 @@ import javax.net.ssl.HttpsURLConnection;
 
 /** Android platform implementation of the VideoPlayerPlugin. */
 public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, ActivityAware {
+
+  public static OnPictureInPictureModeChanged onPictureInPictureModeChanged;
+
   private static final String TAG = "VideoPlayerPlugin";
   private final LongSparseArray<VideoPlayer> videoPlayers = new LongSparseArray<>();
   private FlutterState flutterState;
@@ -218,11 +225,32 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
     options.mixWithOthers = arg.getMixWithOthers();
   }
 
-  public void setPictureInPicture(){
-    if (Build.VERSION.SDK_INT > 24)
-        activity.enterPictureInPictureMode();
-  }
+    @Override
+    @SuppressWarnings("deprecation")
+    public void setPictureInPicture(@NonNull Messages.PictureInPictureMessage arg) {
+        if (Build.VERSION.SDK_INT >= 24) {
+            if (Build.VERSION.SDK_INT >= 26) {
+                double density = flutterState.applicationContext.getResources().getDisplayMetrics().density;
+                double left = arg.getLeft() * density;
+                double top = arg.getTop() * density;
+                double right = left + arg.getWidth() * density;
+                double bottom = top + arg.getHeight() * density;
 
+                PictureInPictureParams params = new PictureInPictureParams.Builder()
+                        .setAspectRatio(new Rational(arg.getWidth().intValue(),
+                                arg.getHeight().intValue()))
+                        .setSourceRectHint(new Rect((int) left,
+                                (int) top,
+                                (int) right,
+                                (int) bottom))
+                        .build();
+
+                activity.enterPictureInPictureMode(params);
+            } else {
+                activity.enterPictureInPictureMode();
+            }
+        }
+    }
 
   private interface KeyForAssetFn {
     String get(String asset);
@@ -268,8 +296,6 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
 
   @Override
     public void onDetachedFromActivityForConfigChanges() {
-        // TODO: the Activity your plugin was attached to was destroyed to change configuration.
-        // This call will be followed by onReattachedToActivityForConfigChanges().
     }
 
     @Override
@@ -279,6 +305,15 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
 
     @Override
     public void onDetachedFromActivity() {
-        // TODO: your plugin is no longer associated with an Activity. Clean up references.
+    }
+
+    public static void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        if (onPictureInPictureModeChanged != null) {
+            onPictureInPictureModeChanged.onChanged(isInPictureInPictureMode, newConfig);
+        }
+    }
+
+    interface OnPictureInPictureModeChanged {
+        void onChanged(boolean isInPictureInPictureMode, Configuration newConfig);
     }
 }

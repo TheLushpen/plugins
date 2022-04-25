@@ -21,6 +21,7 @@ class _ApiLogger implements TestHostVideoPlayerApi {
   VolumeMessage? volumeMessage;
   PlaybackSpeedMessage? playbackSpeedMessage;
   MixWithOthersMessage? mixWithOthersMessage;
+  PictureInPictureMessage? pictureInPictureMessage;
 
   @override
   TextureMessage create(CreateMessage arg) {
@@ -87,6 +88,12 @@ class _ApiLogger implements TestHostVideoPlayerApi {
   void setPlaybackSpeed(PlaybackSpeedMessage arg) {
     log.add('setPlaybackSpeed');
     playbackSpeedMessage = arg;
+  }
+
+  @override
+  void setPictureInPicture(PictureInPictureMessage arg) {
+    log.add('setPictureInPicture');
+    pictureInPictureMessage = arg;
   }
 }
 

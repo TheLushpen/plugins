@@ -506,11 +506,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
             return;
           }
 
-          if (requestPosition != null) {
-            if ((newPosition - requestPosition!).inMilliseconds.abs() > 3000) {
+          if (_requestPosition != null) {
+            if ((newPosition - _requestPosition!).inMilliseconds.abs() > 3000) {
               return;
             } else {
-              requestPosition = null;
+              _requestPosition = null;
             }
           }
 
@@ -586,13 +586,13 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       position = const Duration();
     }
 
-    requestPosition = position;
+    _requestPosition = position;
 
     await _videoPlayerPlatform.seekTo(_textureId, position);
     _updatePosition(position);
   }
 
-  Duration? requestPosition;
+  Duration? _requestPosition;
 
   /// Sets the audio volume of [this].
   ///
@@ -764,11 +764,15 @@ class _VideoAppLifeCycleObserver extends Object with WidgetsBindingObserver {
 /// Widget that displays the video controlled by [controller].
 class VideoPlayer extends StatefulWidget {
   /// Uses the given [controller] for all video rendered in this widget.
-  const VideoPlayer(this.controller);
+  const VideoPlayer(this.controller, {Key? key, this.fullScreenListener})
+      : super(key: key);
 
   /// The [VideoPlayerController] responsible for the video being rendered in
   /// this widget.
   final VideoPlayerController controller;
+
+  /// Calls on enter to pip mode on android
+  final Function(bool isFullScreen)? fullScreenListener;
 
   @override
   _VideoPlayerState createState() => _VideoPlayerState();
@@ -779,18 +783,27 @@ class _VideoPlayerState extends State<VideoPlayer> {
     _listener = () {
       final int newTextureId = widget.controller.textureId;
       final bool newEnabledVideo = !widget.controller.value.isShowingPIP;
+      final bool isEnabledVideoChanged = newEnabledVideo != _enabledVideo;
 
-      if (newTextureId != _textureId || newEnabledVideo != _enabledVideo) {
+      if (newTextureId != _textureId || isEnabledVideoChanged) {
         setState(() {
           _textureId = newTextureId;
           _enabledVideo = newEnabledVideo;
         });
+
+        if (isEnabledVideoChanged &&
+            Theme.of(context).platform == TargetPlatform.android) {
+          if (_enabledVideo) {
+            _exitFullScreenMode();
+          } else {
+            _enterFullScreenMode();
+          }
+        }
       }
     };
   }
 
   late VoidCallback _listener;
-
   late int _textureId;
   late bool _enabledVideo;
 
@@ -798,7 +811,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
   void initState() {
     super.initState();
     _textureId = widget.controller.textureId;
-    _enabledVideo = (!widget.controller.value.isShowingPIP);
+    _enabledVideo = !widget.controller.value.isShowingPIP;
 
     // Need to listen for initialization events since the actual texture ID
     // becomes available after asynchronous initialization finishes.
@@ -826,6 +839,34 @@ class _VideoPlayerState extends State<VideoPlayer> {
             !_enabledVideo
         ? Container()
         : _videoPlayerPlatform.buildView(_textureId);
+  }
+
+  void _enterFullScreenMode() {
+    final TransitionRoute<void> route = PageRouteBuilder<void>(
+      pageBuilder: _fullScreenRoutePageBuilder,
+    );
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: <SystemUiOverlay>[]);
+
+    Navigator.of(context).push(route);
+  }
+
+  void _exitFullScreenMode() {
+    Navigator.of(context).pop();
+
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+  }
+
+  Widget _fullScreenRoutePageBuilder(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return _videoPlayerPlatform.buildView(_textureId);
   }
 }
 

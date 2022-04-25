@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:video_player_platform_interface/messages.dart';
+import 'package:video_player_platform_interface/messages.g.dart';
 import 'package:video_player_platform_interface/method_channel_video_player.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
@@ -21,12 +21,13 @@ class _ApiLogger implements TestHostVideoPlayerApi {
   VolumeMessage? volumeMessage;
   PlaybackSpeedMessage? playbackSpeedMessage;
   MixWithOthersMessage? mixWithOthersMessage;
+  PictureInPictureMessage? pictureInPictureMessage;
 
   @override
   TextureMessage create(CreateMessage arg) {
     log.add('create');
     createMessage = arg;
-    return TextureMessage()..textureId = 3;
+    return TextureMessage(textureId: 3);
   }
 
   @override
@@ -62,7 +63,7 @@ class _ApiLogger implements TestHostVideoPlayerApi {
   PositionMessage position(TextureMessage arg) {
     log.add('position');
     textureMessage = arg;
-    return PositionMessage()..position = 234;
+    return PositionMessage(position: 234, textureId: 3);
   }
 
   @override
@@ -87,6 +88,12 @@ class _ApiLogger implements TestHostVideoPlayerApi {
   void setPlaybackSpeed(PlaybackSpeedMessage arg) {
     log.add('setPlaybackSpeed');
     playbackSpeedMessage = arg;
+  }
+
+  @override
+  void setPictureInPicture(PictureInPictureMessage arg) {
+    log.add('PictureInPictureMessage');
+    pictureInPictureMessage = arg;
   }
 }
 

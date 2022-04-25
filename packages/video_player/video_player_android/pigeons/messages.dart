@@ -56,6 +56,24 @@ class MixWithOthersMessage {
   bool mixWithOthers;
 }
 
+class PictureInPictureMessage {
+  PictureInPictureMessage({
+    required this.textureId,
+    required this.enabled,
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+  });
+
+  final int textureId;
+  final int enabled;
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+}
+
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')
 abstract class AndroidVideoPlayerApi {
   void initialize();
@@ -69,4 +87,5 @@ abstract class AndroidVideoPlayerApi {
   void seekTo(PositionMessage msg);
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);
+  void setPictureInPicture(PictureInPictureMessage arg);
 }

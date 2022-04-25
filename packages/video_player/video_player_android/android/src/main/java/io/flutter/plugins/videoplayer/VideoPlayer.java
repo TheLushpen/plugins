@@ -10,7 +10,9 @@ import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
 import android.content.Context;
 import android.net.Uri;
 import android.view.Surface;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
@@ -31,13 +33,15 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.Util;
-import io.flutter.plugin.common.EventChannel;
-import io.flutter.view.TextureRegistry;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.flutter.plugin.common.EventChannel;
+import io.flutter.view.TextureRegistry;
 
 final class VideoPlayer {
   private static final String FORMAT_SS = "ss";
@@ -214,6 +218,12 @@ final class VideoPlayer {
             }
           }
         });
+
+    VideoPlayerPlugin.onPictureInPictureModeChanged = (isInPictureInPictureMode, newConfig) -> {
+        Map<String, Object> event = new HashMap<>();
+        event.put("event", isInPictureInPictureMode ? "startingPiP" : "stoppedPiP");
+        eventSink.success(event);
+    };
   }
 
   void sendBufferingUpdate() {
