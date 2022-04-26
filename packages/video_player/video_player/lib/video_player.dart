@@ -807,6 +807,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
   late int _textureId;
   late bool _enabledVideo;
 
+  TransitionRoute<dynamic>? _fullscreenRoute;
+
   @override
   void initState() {
     super.initState();
@@ -842,23 +844,25 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   void _enterFullScreenMode() {
-    final TransitionRoute<void> route = PageRouteBuilder<void>(
-      pageBuilder: _fullScreenRoutePageBuilder,
-    );
-
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: <SystemUiOverlay>[]);
 
-    Navigator.of(context).push(route);
+    Navigator.of(context).push(_fullscreenRoute = PageRouteBuilder<void>(
+      pageBuilder: _fullScreenRoutePageBuilder,
+    ));
   }
 
   void _exitFullScreenMode() {
-    Navigator.of(context).pop();
-
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
     );
+
+    if (_fullscreenRoute != null) {
+      Navigator.of(context).removeRoute(_fullscreenRoute!);
+    }
+
+    _fullscreenRoute = null;
   }
 
   Widget _fullScreenRoutePageBuilder(
