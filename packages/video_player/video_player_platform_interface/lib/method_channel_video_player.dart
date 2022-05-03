@@ -20,9 +20,8 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
   final VideoPlayerApi _api = VideoPlayerApi();
 
   @override
-  Future<void> init(double left, double top, double width, double height) {
-    return _api.initialize(
-        InitializeMessage(left: left, top: top, width: width, height: height));
+  Future<void> init() {
+    return _api.initialize();
   }
 
   @override
@@ -31,7 +30,8 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<int?> create(DataSource dataSource) async {
+  Future<int?> create(DataSource dataSource, double left, double top,
+      double width, double height) async {
     late final CreateMessage message;
 
     switch (dataSource.sourceType) {
@@ -39,6 +39,10 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
         message = CreateMessage(
           asset: dataSource.asset,
           packageName: dataSource.package,
+          left: left,
+          top: top,
+          width: width,
+          height: height,
         );
         break;
       case DataSourceType.network:
@@ -46,11 +50,21 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
           uri: dataSource.uri,
           formatHint: _videoFormatStringMap[dataSource.formatHint],
           httpHeaders: dataSource.httpHeaders,
+          left: left,
+          top: top,
+          width: width,
+          height: height,
         );
         break;
       case DataSourceType.contentUri:
       case DataSourceType.file:
-        message = CreateMessage(uri: dataSource.uri);
+        message = CreateMessage(
+          uri: dataSource.uri,
+          left: left,
+          top: top,
+          width: width,
+          height: height,
+        );
         break;
     }
 

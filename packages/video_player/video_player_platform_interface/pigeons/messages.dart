@@ -38,11 +38,17 @@ class PositionMessage {
 }
 
 class CreateMessage {
+  CreateMessage(this.left, this.top, this.width, this.height);
+
   String? asset;
   String? uri;
   String? packageName;
   String? formatHint;
   Map<String?, String?>? httpHeaders;
+  final double left;
+  final double top;
+  final double width;
+  final double height;
 }
 
 class MixWithOthersMessage {
@@ -68,23 +74,9 @@ class PictureInPictureMessage {
   final double height;
 }
 
-class InitializeMessage {
-  InitializeMessage({
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
-  });
-
-  final double left;
-  final double top;
-  final double width;
-  final double height;
-}
-
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')
 abstract class VideoPlayerApi {
-  void initialize(InitializeMessage msg);
+  void initialize();
   TextureMessage create(CreateMessage msg);
   void dispose(TextureMessage msg);
   void setLooping(LoopingMessage msg);

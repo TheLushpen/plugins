@@ -37,7 +37,7 @@ class _ApiLogger implements TestHostVideoPlayerApi {
   }
 
   @override
-  void initialize(InitializeMessage msg) {
+  void initialize() {
     log.add('init');
   }
 
@@ -115,7 +115,7 @@ void main() {
     });
 
     test('init', () async {
-      await player.init(0, 0, 200, 200);
+      await player.init();
       expect(
         log.log.last,
         'init',
@@ -129,11 +129,16 @@ void main() {
     });
 
     test('create with asset', () async {
-      final int? textureId = await player.create(DataSource(
-        sourceType: DataSourceType.asset,
-        asset: 'someAsset',
-        package: 'somePackage',
-      ));
+      final int? textureId = await player.create(
+          DataSource(
+            sourceType: DataSourceType.asset,
+            asset: 'someAsset',
+            package: 'somePackage',
+          ),
+          0,
+          0,
+          200,
+          200);
       expect(log.log.last, 'create');
       expect(log.createMessage?.asset, 'someAsset');
       expect(log.createMessage?.packageName, 'somePackage');
@@ -141,11 +146,16 @@ void main() {
     });
 
     test('create with network', () async {
-      final int? textureId = await player.create(DataSource(
-        sourceType: DataSourceType.network,
-        uri: 'someUri',
-        formatHint: VideoFormat.dash,
-      ));
+      final int? textureId = await player.create(
+          DataSource(
+            sourceType: DataSourceType.network,
+            uri: 'someUri',
+            formatHint: VideoFormat.dash,
+          ),
+          0,
+          0,
+          200,
+          200);
       expect(log.log.last, 'create');
       expect(log.createMessage?.asset, null);
       expect(log.createMessage?.uri, 'someUri');
@@ -156,11 +166,16 @@ void main() {
     });
 
     test('create with network (some headers)', () async {
-      final int? textureId = await player.create(DataSource(
-        sourceType: DataSourceType.network,
-        uri: 'someUri',
-        httpHeaders: <String, String>{'Authorization': 'Bearer token'},
-      ));
+      final int? textureId = await player.create(
+          DataSource(
+            sourceType: DataSourceType.network,
+            uri: 'someUri',
+            httpHeaders: <String, String>{'Authorization': 'Bearer token'},
+          ),
+          0,
+          0,
+          200,
+          200);
       expect(log.log.last, 'create');
       expect(log.createMessage?.asset, null);
       expect(log.createMessage?.uri, 'someUri');
@@ -172,10 +187,15 @@ void main() {
     });
 
     test('create with file', () async {
-      final int? textureId = await player.create(DataSource(
-        sourceType: DataSourceType.file,
-        uri: 'someUri',
-      ));
+      final int? textureId = await player.create(
+          DataSource(
+            sourceType: DataSourceType.file,
+            uri: 'someUri',
+          ),
+          0,
+          0,
+          200,
+          200);
       expect(log.log.last, 'create');
       expect(log.createMessage?.uri, 'someUri');
       expect(textureId, 3);

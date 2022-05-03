@@ -136,6 +136,10 @@ class CreateMessage {
     this.packageName,
     this.formatHint,
     this.httpHeaders,
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
   });
 
   String? asset;
@@ -143,6 +147,10 @@ class CreateMessage {
   String? packageName;
   String? formatHint;
   Map<String?, String?>? httpHeaders;
+  double left;
+  double top;
+  double width;
+  double height;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
@@ -151,6 +159,10 @@ class CreateMessage {
     pigeonMap['packageName'] = packageName;
     pigeonMap['formatHint'] = formatHint;
     pigeonMap['httpHeaders'] = httpHeaders;
+    pigeonMap['left'] = left;
+    pigeonMap['top'] = top;
+    pigeonMap['width'] = width;
+    pigeonMap['height'] = height;
     return pigeonMap;
   }
 
@@ -162,6 +174,10 @@ class CreateMessage {
       packageName: pigeonMap['packageName'] as String?,
       formatHint: pigeonMap['formatHint'] as String?,
       httpHeaders: (pigeonMap['httpHeaders'] as Map<Object?, Object?>?)?.cast<String?, String?>(),
+      left: pigeonMap['left']! as double,
+      top: pigeonMap['top']! as double,
+      width: pigeonMap['width']! as double,
+      height: pigeonMap['height']! as double,
     );
   }
 }
@@ -228,39 +244,6 @@ class PictureInPictureMessage {
   }
 }
 
-class InitializeMessage {
-  InitializeMessage({
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
-  });
-
-  double left;
-  double top;
-  double width;
-  double height;
-
-  Object encode() {
-    final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
-    pigeonMap['left'] = left;
-    pigeonMap['top'] = top;
-    pigeonMap['width'] = width;
-    pigeonMap['height'] = height;
-    return pigeonMap;
-  }
-
-  static InitializeMessage decode(Object message) {
-    final Map<Object?, Object?> pigeonMap = message as Map<Object?, Object?>;
-    return InitializeMessage(
-      left: pigeonMap['left']! as double,
-      top: pigeonMap['top']! as double,
-      width: pigeonMap['width']! as double,
-      height: pigeonMap['height']! as double,
-    );
-  }
-}
-
 class _VideoPlayerApiCodec extends StandardMessageCodec {
   const _VideoPlayerApiCodec();
   @override
@@ -269,36 +252,32 @@ class _VideoPlayerApiCodec extends StandardMessageCodec {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
     } else 
-    if (value is InitializeMessage) {
+    if (value is LoopingMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
     } else 
-    if (value is LoopingMessage) {
+    if (value is MixWithOthersMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
     } else 
-    if (value is MixWithOthersMessage) {
+    if (value is PictureInPictureMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else 
-    if (value is PictureInPictureMessage) {
+    if (value is PlaybackSpeedMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
     } else 
-    if (value is PlaybackSpeedMessage) {
+    if (value is PositionMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else 
-    if (value is PositionMessage) {
+    if (value is TextureMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
     } else 
-    if (value is TextureMessage) {
-      buffer.putUint8(135);
-      writeValue(buffer, value.encode());
-    } else 
     if (value is VolumeMessage) {
-      buffer.putUint8(136);
+      buffer.putUint8(135);
       writeValue(buffer, value.encode());
     } else 
 {
@@ -312,27 +291,24 @@ class _VideoPlayerApiCodec extends StandardMessageCodec {
         return CreateMessage.decode(readValue(buffer)!);
       
       case 129:       
-        return InitializeMessage.decode(readValue(buffer)!);
-      
-      case 130:       
         return LoopingMessage.decode(readValue(buffer)!);
       
-      case 131:       
+      case 130:       
         return MixWithOthersMessage.decode(readValue(buffer)!);
       
-      case 132:       
+      case 131:       
         return PictureInPictureMessage.decode(readValue(buffer)!);
       
-      case 133:       
+      case 132:       
         return PlaybackSpeedMessage.decode(readValue(buffer)!);
       
-      case 134:       
+      case 133:       
         return PositionMessage.decode(readValue(buffer)!);
       
-      case 135:       
+      case 134:       
         return TextureMessage.decode(readValue(buffer)!);
       
-      case 136:       
+      case 135:       
         return VolumeMessage.decode(readValue(buffer)!);
       
       default:      
@@ -352,11 +328,11 @@ class VideoPlayerApi {
 
   static const MessageCodec<Object?> codec = _VideoPlayerApiCodec();
 
-  Future<void> initialize(InitializeMessage arg_msg) async {
+  Future<void> initialize() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.VideoPlayerApi.initialize', codec, binaryMessenger: _binaryMessenger);
     final Map<Object?, Object?>? replyMap =
-        await channel.send(<Object?>[arg_msg]) as Map<Object?, Object?>?;
+        await channel.send(null) as Map<Object?, Object?>?;
     if (replyMap == null) {
       throw PlatformException(
         code: 'channel-error',

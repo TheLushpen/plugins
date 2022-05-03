@@ -22,8 +22,8 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<void> init(double left, double top, double width, double height) {
-    return _api.initialize(InitializeMessage(left: left, top: top, width: width, height: height));
+  Future<void> init() {
+    return _api.initialize();
   }
 
   @override
@@ -32,7 +32,8 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<int?> create(DataSource dataSource) async {
+  Future<int?> create(DataSource dataSource, double left, double top,
+      double width, double height) async {
     String? asset;
     String? packageName;
     String? uri;
@@ -61,6 +62,10 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
       uri: uri,
       httpHeaders: httpHeaders,
       formatHint: formatHint,
+      left: left,
+      top: top,
+      width: width,
+      height: height,
     );
 
     final TextureMessage response = await _api.create(message);

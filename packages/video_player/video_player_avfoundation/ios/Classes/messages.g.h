@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class FLTCreateMessage;
 @class FLTMixWithOthersMessage;
 @class FLTPictureInPictureMessage;
-@class FLTInitializeMessage;
 
 @interface FLTTextureMessage : NSObject
 /// `init` unavailable to enforce nonnull fields, see the `make` class method.
@@ -71,12 +70,20 @@ NS_ASSUME_NONNULL_BEGIN
     uri:(nullable NSString *)uri
     packageName:(nullable NSString *)packageName
     formatHint:(nullable NSString *)formatHint
-    httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders;
+    httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders
+    left:(NSNumber *)left
+    top:(NSNumber *)top
+    width:(NSNumber *)width
+    height:(NSNumber *)height;
 @property(nonatomic, copy, nullable) NSString * asset;
 @property(nonatomic, copy, nullable) NSString * uri;
 @property(nonatomic, copy, nullable) NSString * packageName;
 @property(nonatomic, copy, nullable) NSString * formatHint;
 @property(nonatomic, strong) NSDictionary<NSString *, NSString *> * httpHeaders;
+@property(nonatomic, strong) NSNumber * left;
+@property(nonatomic, strong) NSNumber * top;
+@property(nonatomic, strong) NSNumber * width;
+@property(nonatomic, strong) NSNumber * height;
 @end
 
 @interface FLTMixWithOthersMessage : NSObject
@@ -103,24 +110,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong) NSNumber * height;
 @end
 
-@interface FLTInitializeMessage : NSObject
-/// `init` unavailable to enforce nonnull fields, see the `make` class method.
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)makeWithLeft:(NSNumber *)left
-    top:(NSNumber *)top
-    width:(NSNumber *)width
-    height:(NSNumber *)height;
-@property(nonatomic, strong) NSNumber * left;
-@property(nonatomic, strong) NSNumber * top;
-@property(nonatomic, strong) NSNumber * width;
-@property(nonatomic, strong) NSNumber * height;
-@end
-
 /// The codec used by FLTAVFoundationVideoPlayerApi.
 NSObject<FlutterMessageCodec> *FLTAVFoundationVideoPlayerApiGetCodec(void);
 
 @protocol FLTAVFoundationVideoPlayerApi
-- (void)initialize:(FLTInitializeMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)initialize:(FlutterError *_Nullable *_Nonnull)error;
 /// @return `nil` only when `error != nil`.
 - (nullable FLTTextureMessage *)create:(FLTCreateMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)dispose:(FLTTextureMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;

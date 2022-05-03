@@ -40,7 +40,7 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   ///
   /// This method is called when the plugin is first initialized
   /// and on every full restart.
-  Future<void> init(double left, double top, double width, double height) {
+  Future<void> init() {
     throw UnimplementedError('init() has not been implemented.');
   }
 
@@ -50,7 +50,7 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   }
 
   /// Creates an instance of a video player and returns its textureId.
-  Future<int?> create(DataSource dataSource) {
+  Future<int?> create(DataSource dataSource, double left, double top, double width, double height) {
     throw UnimplementedError('create() has not been implemented.');
   }
 

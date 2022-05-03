@@ -16,44 +16,56 @@ import 'package:pigeon/pigeon.dart';
 ))
 class TextureMessage {
   TextureMessage(this.textureId);
+
   int textureId;
 }
 
 class LoopingMessage {
   LoopingMessage(this.textureId, this.isLooping);
+
   int textureId;
   bool isLooping;
 }
 
 class VolumeMessage {
   VolumeMessage(this.textureId, this.volume);
+
   int textureId;
   double volume;
 }
 
 class PlaybackSpeedMessage {
   PlaybackSpeedMessage(this.textureId, this.speed);
+
   int textureId;
   double speed;
 }
 
 class PositionMessage {
   PositionMessage(this.textureId, this.position);
+
   int textureId;
   int position;
 }
 
 class CreateMessage {
-  CreateMessage({required this.httpHeaders});
+  CreateMessage(this.left, this.top, this.width, this.height, this.httpHeaders);
+
   String? asset;
   String? uri;
   String? packageName;
   String? formatHint;
   Map<String?, String?> httpHeaders;
+
+  final double left;
+  final double top;
+  final double width;
+  final double height;
 }
 
 class MixWithOthersMessage {
   MixWithOthersMessage(this.mixWithOthers);
+
   bool mixWithOthers;
 }
 
@@ -75,44 +87,41 @@ class PictureInPictureMessage {
   final double height;
 }
 
-class InitializeMessage {
-  InitializeMessage({
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
-  });
-
-  final double left;
-  final double top;
-  final double width;
-  final double height;
-}
-
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')
 abstract class AVFoundationVideoPlayerApi {
-  @ObjCSelector('initialize:')
-  void initialize(InitializeMessage msg);
+  @ObjCSelector('initialize')
+  void initialize();
+
   @ObjCSelector('create:')
   TextureMessage create(CreateMessage msg);
+
   @ObjCSelector('dispose:')
   void dispose(TextureMessage msg);
+
   @ObjCSelector('setLooping:')
   void setLooping(LoopingMessage msg);
+
   @ObjCSelector('setVolume:')
   void setVolume(VolumeMessage msg);
+
   @ObjCSelector('setPlaybackSpeed:')
   void setPlaybackSpeed(PlaybackSpeedMessage msg);
+
   @ObjCSelector('play:')
   void play(TextureMessage msg);
+
   @ObjCSelector('position:')
   PositionMessage position(TextureMessage msg);
+
   @ObjCSelector('seekTo:')
   void seekTo(PositionMessage msg);
+
   @ObjCSelector('pause:')
   void pause(TextureMessage msg);
+
   @ObjCSelector('setMixWithOthers:')
   void setMixWithOthers(MixWithOthersMessage msg);
+
   @ObjCSelector('setPictureInPicture:')
   void setPictureInPicture(PictureInPictureMessage arg);
 }

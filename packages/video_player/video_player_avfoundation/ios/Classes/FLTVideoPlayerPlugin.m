@@ -47,7 +47,6 @@
 @property(nonatomic, readonly) BOOL isInitialized;
 @property(nonatomic) AVPlayerLayer* _playerLayer;
 @property(nonatomic) bool _pictureInPicture;
-@property(nonatomic) CGRect frame;
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
                 httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers;
@@ -645,7 +644,8 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
 }
 
 - (FLTTextureMessage *)onPlayerSetup:(FLTVideoPlayer *)player
-                        frameUpdater:(FLTFrameUpdater *)frameUpdater {
+                        frameUpdater:(FLTFrameUpdater *)frameUpdater
+                               frame:(CGRect) frame {
     int64_t textureId = [self.registry registerTexture:player];
     frameUpdater.textureId = textureId;
     FlutterEventChannel *eventChannel = [FlutterEventChannel
@@ -655,6 +655,9 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
     [eventChannel setStreamHandler:player];
     player.eventChannel = eventChannel;
     self.playersByTextureId[@(textureId)] = player;
+    
+    [player usePlayerLayer: frame];
+    
     FLTTextureMessage *result = [FLTTextureMessage makeWithTextureId:@(textureId)];
     return result;
 }
@@ -674,6 +677,7 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
 - (FLTTextureMessage *)create:(FLTCreateMessage *)input error:(FlutterError **)error {
     FLTFrameUpdater *frameUpdater = [[FLTFrameUpdater alloc] initWithRegistry:_registry];
     FLTVideoPlayer *player;
+    
     if (input.asset) {
         NSString *assetPath;
         if (input.packageName) {
@@ -682,12 +686,12 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
             assetPath = [_registrar lookupKeyForAsset:input.asset];
         }
         player = [[FLTVideoPlayer alloc] initWithAsset:assetPath frameUpdater:frameUpdater];
-        return [self onPlayerSetup:player frameUpdater:frameUpdater];
+        return [self onPlayerSetup:player frameUpdater:frameUpdater frame: CGRectMake(input.left.floatValue, input.top.floatValue, input.width.floatValue, input.height.floatValue)];
     } else if (input.uri) {
         player = [[FLTVideoPlayer alloc] initWithURL:[NSURL URLWithString:input.uri]
                                         frameUpdater:frameUpdater
                                          httpHeaders:input.httpHeaders];
-        return [self onPlayerSetup:player frameUpdater:frameUpdater];
+        return [self onPlayerSetup:player frameUpdater:frameUpdater frame: CGRectMake(input.left.floatValue, input.top.floatValue, input.width.floatValue, input.height.floatValue)];
     } else {
         *error = [FlutterError errorWithCode:@"video_player" message:@"not implemented" details:nil];
         return nil;
@@ -766,12 +770,10 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
 }
 
 - (void)setPictureInPicture:(FLTPictureInPictureMessage*)input error:(FlutterError**)error {
-    FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
+    //FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
     if (input.enabled.intValue == 1) {
-        [player usePlayerLayer: CGRectMake(input.left.floatValue, input.top.floatValue,
-                                              input.width.floatValue, input.height.floatValue)];
+        
     } else {
-        [player removePlayerLayer];
     }
 }
 
