@@ -75,10 +75,24 @@ class PictureInPictureMessage {
   final double height;
 }
 
+class InitializeMessage {
+  InitializeMessage({
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+  });
+
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+}
+
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')
 abstract class AVFoundationVideoPlayerApi {
-  @ObjCSelector('initialize')
-  void initialize();
+  @ObjCSelector('initialize:')
+  void initialize(InitializeMessage msg);
   @ObjCSelector('create:')
   TextureMessage create(CreateMessage msg);
   @ObjCSelector('dispose:')

@@ -66,6 +66,10 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 + (FLTPictureInPictureMessage *)fromMap:(NSDictionary *)dict;
 - (NSDictionary *)toMap;
 @end
+@interface FLTInitializeMessage ()
++ (FLTInitializeMessage *)fromMap:(NSDictionary *)dict;
+- (NSDictionary *)toMap;
+@end
 
 @implementation FLTTextureMessage
 + (instancetype)makeWithTextureId:(NSNumber *)textureId {
@@ -251,6 +255,35 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 }
 @end
 
+@implementation FLTInitializeMessage
++ (instancetype)makeWithLeft:(NSNumber *)left
+    top:(NSNumber *)top
+    width:(NSNumber *)width
+    height:(NSNumber *)height {
+  FLTInitializeMessage* pigeonResult = [[FLTInitializeMessage alloc] init];
+  pigeonResult.left = left;
+  pigeonResult.top = top;
+  pigeonResult.width = width;
+  pigeonResult.height = height;
+  return pigeonResult;
+}
++ (FLTInitializeMessage *)fromMap:(NSDictionary *)dict {
+  FLTInitializeMessage *pigeonResult = [[FLTInitializeMessage alloc] init];
+  pigeonResult.left = GetNullableObject(dict, @"left");
+  NSAssert(pigeonResult.left != nil, @"");
+  pigeonResult.top = GetNullableObject(dict, @"top");
+  NSAssert(pigeonResult.top != nil, @"");
+  pigeonResult.width = GetNullableObject(dict, @"width");
+  NSAssert(pigeonResult.width != nil, @"");
+  pigeonResult.height = GetNullableObject(dict, @"height");
+  NSAssert(pigeonResult.height != nil, @"");
+  return pigeonResult;
+}
+- (NSDictionary *)toMap {
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.left ? self.left : [NSNull null]), @"left", (self.top ? self.top : [NSNull null]), @"top", (self.width ? self.width : [NSNull null]), @"width", (self.height ? self.height : [NSNull null]), @"height", nil];
+}
+@end
+
 @interface FLTAVFoundationVideoPlayerApiCodecReader : FlutterStandardReader
 @end
 @implementation FLTAVFoundationVideoPlayerApiCodecReader
@@ -261,24 +294,27 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
       return [FLTCreateMessage fromMap:[self readValue]];
     
     case 129:     
-      return [FLTLoopingMessage fromMap:[self readValue]];
+      return [FLTInitializeMessage fromMap:[self readValue]];
     
     case 130:     
-      return [FLTMixWithOthersMessage fromMap:[self readValue]];
+      return [FLTLoopingMessage fromMap:[self readValue]];
     
     case 131:     
-      return [FLTPictureInPictureMessage fromMap:[self readValue]];
+      return [FLTMixWithOthersMessage fromMap:[self readValue]];
     
     case 132:     
-      return [FLTPlaybackSpeedMessage fromMap:[self readValue]];
+      return [FLTPictureInPictureMessage fromMap:[self readValue]];
     
     case 133:     
-      return [FLTPositionMessage fromMap:[self readValue]];
+      return [FLTPlaybackSpeedMessage fromMap:[self readValue]];
     
     case 134:     
-      return [FLTTextureMessage fromMap:[self readValue]];
+      return [FLTPositionMessage fromMap:[self readValue]];
     
     case 135:     
+      return [FLTTextureMessage fromMap:[self readValue]];
+    
+    case 136:     
       return [FLTVolumeMessage fromMap:[self readValue]];
     
     default:    
@@ -297,32 +333,36 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
     [self writeByte:128];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTLoopingMessage class]]) {
+  if ([value isKindOfClass:[FLTInitializeMessage class]]) {
     [self writeByte:129];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTMixWithOthersMessage class]]) {
+  if ([value isKindOfClass:[FLTLoopingMessage class]]) {
     [self writeByte:130];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTPictureInPictureMessage class]]) {
+  if ([value isKindOfClass:[FLTMixWithOthersMessage class]]) {
     [self writeByte:131];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTPlaybackSpeedMessage class]]) {
+  if ([value isKindOfClass:[FLTPictureInPictureMessage class]]) {
     [self writeByte:132];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTPositionMessage class]]) {
+  if ([value isKindOfClass:[FLTPlaybackSpeedMessage class]]) {
     [self writeByte:133];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTTextureMessage class]]) {
+  if ([value isKindOfClass:[FLTPositionMessage class]]) {
     [self writeByte:134];
     [self writeValue:[value toMap]];
   } else 
-  if ([value isKindOfClass:[FLTVolumeMessage class]]) {
+  if ([value isKindOfClass:[FLTTextureMessage class]]) {
     [self writeByte:135];
+    [self writeValue:[value toMap]];
+  } else 
+  if ([value isKindOfClass:[FLTVolumeMessage class]]) {
+    [self writeByte:136];
     [self writeValue:[value toMap]];
   } else 
 {
@@ -361,10 +401,12 @@ void FLTAVFoundationVideoPlayerApiSetup(id<FlutterBinaryMessenger> binaryMesseng
         binaryMessenger:binaryMessenger
         codec:FLTAVFoundationVideoPlayerApiGetCodec()        ];
     if (api) {
-      NSCAssert([api respondsToSelector:@selector(initialize:)], @"FLTAVFoundationVideoPlayerApi api (%@) doesn't respond to @selector(initialize:)", api);
+      NSCAssert([api respondsToSelector:@selector(initialize:error:)], @"FLTAVFoundationVideoPlayerApi api (%@) doesn't respond to @selector(initialize:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        NSArray *args = message;
+        FLTInitializeMessage *arg_msg = GetNullableObjectAtIndex(args, 0);
         FlutterError *error;
-        [api initialize:&error];
+        [api initialize:arg_msg error:&error];
         callback(wrapResult(nil, error));
       }];
     }

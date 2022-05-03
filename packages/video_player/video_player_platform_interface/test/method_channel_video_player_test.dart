@@ -37,7 +37,7 @@ class _ApiLogger implements TestHostVideoPlayerApi {
   }
 
   @override
-  void initialize() {
+  void initialize(InitializeMessage msg) {
     log.add('init');
   }
 
@@ -119,7 +119,7 @@ void main() {
     });
 
     test('init', () async {
-      await player.init();
+      await player.init(0, 0, 200, 200);
       expect(
         log.log.last,
         'init',

@@ -68,9 +68,23 @@ class PictureInPictureMessage {
   final double height;
 }
 
+class InitializeMessage {
+  InitializeMessage({
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+  });
+
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+}
+
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')
 abstract class VideoPlayerApi {
-  void initialize();
+  void initialize(InitializeMessage msg);
   TextureMessage create(CreateMessage msg);
   void dispose(TextureMessage msg);
   void setLooping(LoopingMessage msg);

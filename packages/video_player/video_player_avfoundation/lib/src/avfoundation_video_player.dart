@@ -22,8 +22,8 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<void> init() {
-    return _api.initialize();
+  Future<void> init(double left, double top, double width, double height) {
+    return _api.initialize(InitializeMessage(left: left, top: top, width: width, height: height));
   }
 
   @override

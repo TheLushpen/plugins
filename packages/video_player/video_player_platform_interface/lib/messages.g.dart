@@ -228,6 +228,39 @@ class PictureInPictureMessage {
   }
 }
 
+class InitializeMessage {
+  InitializeMessage({
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+  });
+
+  double left;
+  double top;
+  double width;
+  double height;
+
+  Object encode() {
+    final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
+    pigeonMap['left'] = left;
+    pigeonMap['top'] = top;
+    pigeonMap['width'] = width;
+    pigeonMap['height'] = height;
+    return pigeonMap;
+  }
+
+  static InitializeMessage decode(Object message) {
+    final Map<Object?, Object?> pigeonMap = message as Map<Object?, Object?>;
+    return InitializeMessage(
+      left: pigeonMap['left']! as double,
+      top: pigeonMap['top']! as double,
+      width: pigeonMap['width']! as double,
+      height: pigeonMap['height']! as double,
+    );
+  }
+}
+
 class _VideoPlayerApiCodec extends StandardMessageCodec {
   const _VideoPlayerApiCodec();
   @override
@@ -236,32 +269,36 @@ class _VideoPlayerApiCodec extends StandardMessageCodec {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
     } else 
-    if (value is LoopingMessage) {
+    if (value is InitializeMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
     } else 
-    if (value is MixWithOthersMessage) {
+    if (value is LoopingMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
     } else 
-    if (value is PictureInPictureMessage) {
+    if (value is MixWithOthersMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
     } else 
-    if (value is PlaybackSpeedMessage) {
+    if (value is PictureInPictureMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
     } else 
-    if (value is PositionMessage) {
+    if (value is PlaybackSpeedMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else 
-    if (value is TextureMessage) {
+    if (value is PositionMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
     } else 
-    if (value is VolumeMessage) {
+    if (value is TextureMessage) {
       buffer.putUint8(135);
+      writeValue(buffer, value.encode());
+    } else 
+    if (value is VolumeMessage) {
+      buffer.putUint8(136);
       writeValue(buffer, value.encode());
     } else 
 {
@@ -275,24 +312,27 @@ class _VideoPlayerApiCodec extends StandardMessageCodec {
         return CreateMessage.decode(readValue(buffer)!);
       
       case 129:       
-        return LoopingMessage.decode(readValue(buffer)!);
+        return InitializeMessage.decode(readValue(buffer)!);
       
       case 130:       
-        return MixWithOthersMessage.decode(readValue(buffer)!);
+        return LoopingMessage.decode(readValue(buffer)!);
       
       case 131:       
-        return PictureInPictureMessage.decode(readValue(buffer)!);
+        return MixWithOthersMessage.decode(readValue(buffer)!);
       
       case 132:       
-        return PlaybackSpeedMessage.decode(readValue(buffer)!);
+        return PictureInPictureMessage.decode(readValue(buffer)!);
       
       case 133:       
-        return PositionMessage.decode(readValue(buffer)!);
+        return PlaybackSpeedMessage.decode(readValue(buffer)!);
       
       case 134:       
-        return TextureMessage.decode(readValue(buffer)!);
+        return PositionMessage.decode(readValue(buffer)!);
       
       case 135:       
+        return TextureMessage.decode(readValue(buffer)!);
+      
+      case 136:       
         return VolumeMessage.decode(readValue(buffer)!);
       
       default:      
@@ -312,11 +352,11 @@ class VideoPlayerApi {
 
   static const MessageCodec<Object?> codec = _VideoPlayerApiCodec();
 
-  Future<void> initialize() async {
+  Future<void> initialize(InitializeMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.VideoPlayerApi.initialize', codec, binaryMessenger: _binaryMessenger);
     final Map<Object?, Object?>? replyMap =
-        await channel.send(null) as Map<Object?, Object?>?;
+        await channel.send(<Object?>[arg_msg]) as Map<Object?, Object?>?;
     if (replyMap == null) {
       throw PlatformException(
         code: 'channel-error',
