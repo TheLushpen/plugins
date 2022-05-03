@@ -32,7 +32,7 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<int?> create(DataSource dataSource) async {
+  Future<int?> create(DataSource dataSource, double left, double top, double width, double height) async {
     String? asset;
     String? packageName;
     String? uri;

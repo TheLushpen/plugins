@@ -475,7 +475,8 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
         }
         
         self._playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
-        self._playerLayer.frame = CGRectMake(0, 0, 340, 290);
+        self._playerLayer.frame = frame;
+        self._playerLayer.hidden = YES;
         self._playerLayer.needsDisplayOnBoundsChange = YES;
         
         UIViewController* vc = [[[UIApplication sharedApplication] keyWindow] rootViewController];

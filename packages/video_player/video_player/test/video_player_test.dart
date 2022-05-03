@@ -50,7 +50,12 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
   Future<void> setPlaybackSpeed(double speed) async {}
 
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize({
+    double left = 0,
+    double top = 0,
+    double width = 0,
+    double hegiht = 0,
+  }) async {}
 
   @override
   Future<void> pause() async {}
@@ -1033,7 +1038,13 @@ class FakeVideoPlayerPlatform extends VideoPlayerPlatform {
   final Map<int, Duration> _positions = <int, Duration>{};
 
   @override
-  Future<int?> create(DataSource dataSource) async {
+  Future<int?> create(
+    DataSource dataSource,
+    double left,
+    double top,
+    double width,
+    double hegiht,
+  ) async {
     calls.add('create');
     final StreamController<VideoEvent> stream = StreamController<VideoEvent>();
     streams[nextTextureId] = stream;
