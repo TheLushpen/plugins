@@ -729,6 +729,10 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       double height = 0.0}) async {
     await _setPictureInPicture(enabled, left, top, width, height);
   }
+
+  Future<void> showAirPlayMenu(){
+    return _videoPlayerPlatform.showAirPlayMenu(_textureId);
+  }
 }
 
 class _VideoAppLifeCycleObserver extends Object with WidgetsBindingObserver {

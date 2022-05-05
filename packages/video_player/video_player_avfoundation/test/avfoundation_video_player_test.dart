@@ -95,6 +95,12 @@ class _ApiLogger implements TestHostVideoPlayerApi {
     log.add('setPictureInPicture');
     pictureInPictureMessage = arg;
   }
+
+  @override
+  void showAirPlayMenu(TextureMessage msg) {
+    log.add('showAirPlayMenu');
+    textureMessage = msg;
+  }
 }
 
 void main() {

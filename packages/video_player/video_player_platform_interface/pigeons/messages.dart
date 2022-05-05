@@ -88,4 +88,5 @@ abstract class VideoPlayerApi {
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);
   void setPictureInPicture(PictureInPictureMessage arg);
+  void showAirPlayMenu(TextureMessage msg);
 }

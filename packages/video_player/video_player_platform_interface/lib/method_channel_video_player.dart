@@ -183,6 +183,11 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
     ));
   }
 
+  @override
+  Future<void> showAirPlayMenu(int textureId) {
+    return _api.showAirPlayMenu(TextureMessage(textureId: textureId));
+  }
+
   EventChannel _eventChannelFor(int textureId) {
     return EventChannel('flutter.io/videoPlayer/videoEvents$textureId');
   }

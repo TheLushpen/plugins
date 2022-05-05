@@ -46,6 +46,7 @@
 @property(nonatomic) BOOL isLooping;
 @property(nonatomic, readonly) BOOL isInitialized;
 @property(nonatomic) AVPlayerLayer* _playerLayer;
+@property(nonatomic) AVRoutePickerView* picker;
 @property(nonatomic) bool _pictureInPicture;
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
@@ -388,6 +389,18 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
     [self updatePlayingState];
 }
 
+- (void)showAirPlayMenu {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for(UIView* view in self.picker.subviews){
+            if( [view isKindOfClass:[UIButton class]]){
+                UIButton* button = (UIButton *) view;
+                
+                [button sendActionsForControlEvents:UIControlEventTouchUpInside];
+            }
+        }
+    });
+}
+
 - (int64_t)position {
     return FLTCMTimeToMillis([_player currentTime]);
 }
@@ -488,6 +501,16 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
             _pipController.canStartPictureInPictureAutomaticallyFromInline = YES;
         }
         _pipController.delegate = self;
+        
+        if (@available(iOS 11.0, *)) {
+            self.picker = [[AVRoutePickerView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+            self.picker.hidden = YES;
+            
+            [vc.view addSubview:self.picker];
+        } else {
+            // Fallback on earlier versions
+        }
+       
     }
 }
 
@@ -777,5 +800,12 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
     } else {
     }
 }
+
+- (void)showAirPlayMenu:(FLTTextureMessage *)msg error:(FlutterError *_Nullable __autoreleasing *)error{
+    FLTVideoPlayer *player = self.playersByTextureId[msg.textureId];
+    [player showAirPlayMenu];
+}
+
+
 
 @end

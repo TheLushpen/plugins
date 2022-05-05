@@ -50,7 +50,8 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   }
 
   /// Creates an instance of a video player and returns its textureId.
-  Future<int?> create(DataSource dataSource, double left, double top, double width, double height) {
+  Future<int?> create(DataSource dataSource, double left, double top,
+      double width, double height) {
     throw UnimplementedError('create() has not been implemented.');
   }
 
@@ -105,8 +106,15 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   }
 
   /// Sets the setPictureInPictureVideo.
-  Future<void> setPictureInPicture(int textureId, bool enabled, double left, double top, double width, double height) {
-    throw UnimplementedError('setPictureInPictureVideo() has not been implemented.');
+  Future<void> setPictureInPicture(int textureId, bool enabled, double left,
+      double top, double width, double height) {
+    throw UnimplementedError(
+        'setPictureInPictureVideo() has not been implemented.');
+  }
+
+  /// Sets the showAirPlayMenu.
+  Future<void> showAirPlayMenu(int textureId) {
+    throw UnimplementedError('showAirPlayMenu() has not been implemented.');
   }
 }
 

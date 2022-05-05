@@ -124,4 +124,7 @@ abstract class AVFoundationVideoPlayerApi {
 
   @ObjCSelector('setPictureInPicture:')
   void setPictureInPicture(PictureInPictureMessage arg);
+
+  @ObjCSelector('showAirPlayMenu:')
+  void showAirPlayMenu(TextureMessage msg);
 }
