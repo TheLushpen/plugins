@@ -223,6 +223,8 @@ class VideoEvent {
     this.size,
     this.rotationCorrection,
     this.buffered,
+    this.pipEnable = false,
+    this.castEnable = false,
   });
 
   /// The type of the event.
@@ -248,6 +250,10 @@ class VideoEvent {
   /// Only used if [eventType] is [VideoEventType.bufferingUpdate].
   final List<DurationRange>? buffered;
 
+  final bool pipEnable;
+
+  final bool castEnable;
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -257,16 +263,21 @@ class VideoEvent {
             duration == other.duration &&
             size == other.size &&
             rotationCorrection == other.rotationCorrection &&
-            listEquals(buffered, other.buffered);
+            listEquals(buffered, other.buffered) &&
+            pipEnable == other.pipEnable &&
+            castEnable == other.castEnable;
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode =>
+      Object.hash(
         eventType,
         duration,
         size,
         rotationCorrection,
         buffered,
+        pipEnable,
+        castEnable,
       );
 }
 
@@ -362,10 +373,10 @@ class DurationRange {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DurationRange &&
-          runtimeType == other.runtimeType &&
-          start == other.start &&
-          end == other.end;
+          other is DurationRange &&
+              runtimeType == other.runtimeType &&
+              start == other.start &&
+              end == other.end;
 
   @override
   int get hashCode => Object.hash(start, end);

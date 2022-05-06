@@ -128,6 +128,7 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
             size: Size((map['width'] as num?)?.toDouble() ?? 0.0,
                 (map['height'] as num?)?.toDouble() ?? 0.0),
             rotationCorrection: map['rotationCorrection'] as int? ?? 0,
+            pipEnable: map['pipEnable'] as bool? ?? false,
           );
         case 'completed':
           return VideoEvent(
@@ -173,9 +174,7 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
   @override
   Future<void> setPictureInPicture(int textureId, bool enabled) {
     return _api.setPictureInPicture(PictureInPictureMessage(
-      textureId: textureId,
-      enabled: enabled ? 1 : 0
-    ));
+        textureId: textureId, enabled: enabled ? 1 : 0));
   }
 
   @override

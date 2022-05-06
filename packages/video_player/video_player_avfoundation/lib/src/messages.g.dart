@@ -210,27 +210,15 @@ class PictureInPictureMessage {
   PictureInPictureMessage({
     required this.textureId,
     required this.enabled,
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
   });
 
   int textureId;
   int enabled;
-  double left;
-  double top;
-  double width;
-  double height;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
     pigeonMap['textureId'] = textureId;
     pigeonMap['enabled'] = enabled;
-    pigeonMap['left'] = left;
-    pigeonMap['top'] = top;
-    pigeonMap['width'] = width;
-    pigeonMap['height'] = height;
     return pigeonMap;
   }
 
@@ -239,10 +227,6 @@ class PictureInPictureMessage {
     return PictureInPictureMessage(
       textureId: pigeonMap['textureId']! as int,
       enabled: pigeonMap['enabled']! as int,
-      left: pigeonMap['left']! as double,
-      top: pigeonMap['top']! as double,
-      width: pigeonMap['width']! as double,
-      height: pigeonMap['height']! as double,
     );
   }
 }

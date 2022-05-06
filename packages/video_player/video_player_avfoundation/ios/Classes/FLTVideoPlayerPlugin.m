@@ -46,11 +46,12 @@
 @property(nonatomic) BOOL isLooping;
 @property(nonatomic, readonly) BOOL isInitialized;
 @property(nonatomic) AVPlayerLayer* _playerLayer;
-@property(nonatomic) AVRoutePickerView* picker;
+@property(nonatomic) UIButton* picker;
 @property(nonatomic) bool _pictureInPicture;
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
-                httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers;
+                httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers
+                      frame:(CGRect) frame;
 @end
 
 static void *timeRangeContext = &timeRangeContext;
@@ -70,9 +71,9 @@ AVPictureInPictureController *_pipController;
 #endif
 
 @implementation FLTVideoPlayer
-- (instancetype)initWithAsset:(NSString *)asset frameUpdater:(FLTFrameUpdater *)frameUpdater {
+- (instancetype)initWithAsset:(NSString *)asset frameUpdater:(FLTFrameUpdater *)frameUpdater frame:(CGRect) frame {
     NSString *path = [[NSBundle mainBundle] pathForResource:asset ofType:nil];
-    return [self initWithURL:[NSURL fileURLWithPath:path] frameUpdater:frameUpdater httpHeaders:@{}];
+    return [self initWithURL:[NSURL fileURLWithPath:path] frameUpdater:frameUpdater httpHeaders:@{} frame:frame];
 }
 
 - (void)addObservers:(AVPlayerItem *)item {
@@ -194,18 +195,20 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
-                httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers {
+                httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers
+                      frame:(CGRect) frame{
     NSDictionary<NSString *, id> *options = nil;
     if ([headers count] != 0) {
         options = @{@"AVURLAssetHTTPHeaderFieldsKey" : headers};
     }
     AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:options];
     AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:urlAsset];
-    return [self initWithPlayerItem:item frameUpdater:frameUpdater];
+    return [self initWithPlayerItem:item frameUpdater:frameUpdater frame:frame];
 }
 
 - (instancetype)initWithPlayerItem:(AVPlayerItem *)item
-                      frameUpdater:(FLTFrameUpdater *)frameUpdater {
+                      frameUpdater:(FLTFrameUpdater *)frameUpdater
+                             frame:(CGRect) frame{
     self = [super init];
     NSAssert(self, @"super init cannot be nil");
     
@@ -239,6 +242,10 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
     };
     
     _player = [AVPlayer playerWithPlayerItem:item];
+    
+    [self usePlayerLayer: frame];
+    [self setupCastbutton];
+    
     _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
     
     if (@available(iOS 10.0, *)) {
@@ -253,6 +260,23 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
     [asset loadValuesAsynchronouslyForKeys:@[ @"tracks" ] completionHandler:assetCompletionHandler];
     
     return self;
+}
+
+- (void)setupCastbutton{
+    if (@available(iOS 11.0, *)) {
+        AVRoutePickerView* pickerView = [[AVRoutePickerView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        pickerView.hidden = YES;
+        
+        for(UIView* view in pickerView.subviews){
+            if([view isKindOfClass:[UIButton class]]){
+                self.picker = (UIButton *) view;
+                break;
+            }
+        }
+        
+        UIViewController* vc = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+        [vc.view addSubview:pickerView];
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)path
@@ -374,7 +398,9 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
             @"event" : @"initialized",
             @"duration" : @(duration),
             @"width" : @(width),
-            @"height" : @(height)
+            @"height" : @(height),
+            @"pipEnable": @(_pipController != nil),
+            @"castEnable": @(_picker != nil),
         });
     }
 }
@@ -390,15 +416,11 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)showAirPlayMenu {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for(UIView* view in self.picker.subviews){
-            if( [view isKindOfClass:[UIButton class]]){
-                UIButton* button = (UIButton *) view;
-                
-                [button sendActionsForControlEvents:UIControlEventTouchUpInside];
-            }
-        }
-    });
+    if(self.picker){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.picker sendActionsForControlEvents:UIControlEventTouchUpInside];
+        });
+    }
 }
 
 - (int64_t)position {
@@ -501,16 +523,6 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
             _pipController.canStartPictureInPictureAutomaticallyFromInline = YES;
         }
         _pipController.delegate = self;
-        
-        if (@available(iOS 11.0, *)) {
-            self.picker = [[AVRoutePickerView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-            self.picker.hidden = YES;
-            
-            [vc.view addSubview:self.picker];
-        } else {
-            // Fallback on earlier versions
-        }
-       
     }
 }
 
@@ -521,6 +533,7 @@ NS_INLINE CGFloat radiansToDegrees(CGFloat radians) {
         [self setupPipController: frame];
     }
 }
+
 
 - (void)removePlayerLayer
 {
@@ -668,8 +681,7 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
 }
 
 - (FLTTextureMessage *)onPlayerSetup:(FLTVideoPlayer *)player
-                        frameUpdater:(FLTFrameUpdater *)frameUpdater
-                               frame:(CGRect) frame {
+                        frameUpdater:(FLTFrameUpdater *)frameUpdater {
     int64_t textureId = [self.registry registerTexture:player];
     frameUpdater.textureId = textureId;
     FlutterEventChannel *eventChannel = [FlutterEventChannel
@@ -679,8 +691,6 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
     [eventChannel setStreamHandler:player];
     player.eventChannel = eventChannel;
     self.playersByTextureId[@(textureId)] = player;
-    
-    [player usePlayerLayer: frame];
     
     FLTTextureMessage *result = [FLTTextureMessage makeWithTextureId:@(textureId)];
     return result;
@@ -709,13 +719,14 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
         } else {
             assetPath = [_registrar lookupKeyForAsset:input.asset];
         }
-        player = [[FLTVideoPlayer alloc] initWithAsset:assetPath frameUpdater:frameUpdater];
-        return [self onPlayerSetup:player frameUpdater:frameUpdater frame: CGRectMake(input.left.floatValue, input.top.floatValue, input.width.floatValue, input.height.floatValue)];
+        player = [[FLTVideoPlayer alloc] initWithAsset:assetPath frameUpdater:frameUpdater frame: CGRectMake(input.left.floatValue, input.top.floatValue, input.width.floatValue, input.height.floatValue)];
+        return [self onPlayerSetup:player frameUpdater:frameUpdater];
     } else if (input.uri) {
         player = [[FLTVideoPlayer alloc] initWithURL:[NSURL URLWithString:input.uri]
                                         frameUpdater:frameUpdater
-                                         httpHeaders:input.httpHeaders];
-        return [self onPlayerSetup:player frameUpdater:frameUpdater frame: CGRectMake(input.left.floatValue, input.top.floatValue, input.width.floatValue, input.height.floatValue)];
+                                         httpHeaders:input.httpHeaders
+                                               frame: CGRectMake(input.left.floatValue, input.top.floatValue, input.width.floatValue, input.height.floatValue)];
+        return [self onPlayerSetup:player frameUpdater:frameUpdater];
     } else {
         *error = [FlutterError errorWithCode:@"video_player" message:@"not implemented" details:nil];
         return nil;
@@ -794,18 +805,12 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
 }
 
 - (void)setPictureInPicture:(FLTPictureInPictureMessage*)input error:(FlutterError**)error {
-    //FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
-    if (input.enabled.intValue == 1) {
-        
-    } else {
-    }
+    FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
+    [player setPictureInPicture: input.enabled.intValue == 1];
 }
 
 - (void)showAirPlayMenu:(FLTTextureMessage *)msg error:(FlutterError *_Nullable __autoreleasing *)error{
     FLTVideoPlayer *player = self.playersByTextureId[msg.textureId];
     [player showAirPlayMenu];
 }
-
-
-
 @end

@@ -97,17 +97,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// `init` unavailable to enforce nonnull fields, see the `make` class method.
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)makeWithTextureId:(NSNumber *)textureId
-    enabled:(NSNumber *)enabled
-    left:(NSNumber *)left
-    top:(NSNumber *)top
-    width:(NSNumber *)width
-    height:(NSNumber *)height;
+    enabled:(NSNumber *)enabled;
 @property(nonatomic, strong) NSNumber * textureId;
 @property(nonatomic, strong) NSNumber * enabled;
-@property(nonatomic, strong) NSNumber * left;
-@property(nonatomic, strong) NSNumber * top;
-@property(nonatomic, strong) NSNumber * width;
-@property(nonatomic, strong) NSNumber * height;
 @end
 
 /// The codec used by FLTAVFoundationVideoPlayerApi.

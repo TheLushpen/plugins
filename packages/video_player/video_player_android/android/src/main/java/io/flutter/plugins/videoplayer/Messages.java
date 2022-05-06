@@ -512,42 +512,6 @@ public class Messages {
       this.enabled = setterArg;
     }
 
-    private @NonNull Double left;
-    public @NonNull Double getLeft() { return left; }
-    public void setLeft(@NonNull Double setterArg) {
-      if (setterArg == null) {
-        throw new IllegalStateException("Nonnull field \"left\" is null.");
-      }
-      this.left = setterArg;
-    }
-
-    private @NonNull Double top;
-    public @NonNull Double getTop() { return top; }
-    public void setTop(@NonNull Double setterArg) {
-      if (setterArg == null) {
-        throw new IllegalStateException("Nonnull field \"top\" is null.");
-      }
-      this.top = setterArg;
-    }
-
-    private @NonNull Double width;
-    public @NonNull Double getWidth() { return width; }
-    public void setWidth(@NonNull Double setterArg) {
-      if (setterArg == null) {
-        throw new IllegalStateException("Nonnull field \"width\" is null.");
-      }
-      this.width = setterArg;
-    }
-
-    private @NonNull Double height;
-    public @NonNull Double getHeight() { return height; }
-    public void setHeight(@NonNull Double setterArg) {
-      if (setterArg == null) {
-        throw new IllegalStateException("Nonnull field \"height\" is null.");
-      }
-      this.height = setterArg;
-    }
-
     /** Constructor is private to enforce null safety; use Builder. */
     private PictureInPictureMessage() {}
     public static final class Builder {
@@ -561,34 +525,10 @@ public class Messages {
         this.enabled = setterArg;
         return this;
       }
-      private @Nullable Double left;
-      public @NonNull Builder setLeft(@NonNull Double setterArg) {
-        this.left = setterArg;
-        return this;
-      }
-      private @Nullable Double top;
-      public @NonNull Builder setTop(@NonNull Double setterArg) {
-        this.top = setterArg;
-        return this;
-      }
-      private @Nullable Double width;
-      public @NonNull Builder setWidth(@NonNull Double setterArg) {
-        this.width = setterArg;
-        return this;
-      }
-      private @Nullable Double height;
-      public @NonNull Builder setHeight(@NonNull Double setterArg) {
-        this.height = setterArg;
-        return this;
-      }
       public @NonNull PictureInPictureMessage build() {
         PictureInPictureMessage pigeonReturn = new PictureInPictureMessage();
         pigeonReturn.setTextureId(textureId);
         pigeonReturn.setEnabled(enabled);
-        pigeonReturn.setLeft(left);
-        pigeonReturn.setTop(top);
-        pigeonReturn.setWidth(width);
-        pigeonReturn.setHeight(height);
         return pigeonReturn;
       }
     }
@@ -596,10 +536,6 @@ public class Messages {
       Map<String, Object> toMapResult = new HashMap<>();
       toMapResult.put("textureId", textureId);
       toMapResult.put("enabled", enabled);
-      toMapResult.put("left", left);
-      toMapResult.put("top", top);
-      toMapResult.put("width", width);
-      toMapResult.put("height", height);
       return toMapResult;
     }
     static @NonNull PictureInPictureMessage fromMap(@NonNull Map<String, Object> map) {
@@ -608,14 +544,6 @@ public class Messages {
       pigeonResult.setTextureId((textureId == null) ? null : ((textureId instanceof Integer) ? (Integer)textureId : (Long)textureId));
       Object enabled = map.get("enabled");
       pigeonResult.setEnabled((enabled == null) ? null : ((enabled instanceof Integer) ? (Integer)enabled : (Long)enabled));
-      Object left = map.get("left");
-      pigeonResult.setLeft((Double)left);
-      Object top = map.get("top");
-      pigeonResult.setTop((Double)top);
-      Object width = map.get("width");
-      pigeonResult.setWidth((Double)width);
-      Object height = map.get("height");
-      pigeonResult.setHeight((Double)height);
       return pigeonResult;
     }
   }

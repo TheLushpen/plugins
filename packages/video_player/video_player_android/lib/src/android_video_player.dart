@@ -32,7 +32,8 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<int?> create(DataSource dataSource, double left, double top, double width, double height) async {
+  Future<int?> create(DataSource dataSource, double left, double top,
+      double width, double height) async {
     String? asset;
     String? packageName;
     String? uri;
@@ -118,7 +119,7 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
   @override
   Future<Duration> getPosition(int textureId) async {
     final PositionMessage response =
-        await _api.position(TextureMessage(textureId: textureId));
+    await _api.position(TextureMessage(textureId: textureId));
     return Duration(milliseconds: response.position);
   }
 
@@ -135,6 +136,7 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
             duration: Duration(milliseconds: map['duration'] as int),
             size: Size((map['width'] as num?)?.toDouble() ?? 0.0,
                 (map['height'] as num?)?.toDouble() ?? 0.0),
+            pipEnable: map['pipEnable'] as bool? ?? false,
           );
         case 'completed':
           return VideoEvent(
@@ -177,15 +179,10 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<void> setPictureInPicture(int textureId, bool enabled, double left,
-      double top, double width, double height) {
+  Future<void> setPictureInPicture(int textureId, bool enabled) {
     return _api.setPictureInPicture(PictureInPictureMessage(
-      textureId: textureId,
-      enabled: enabled ? 1 : 0,
-      left: left,
-      top: top,
-      width: width,
-      height: height,
+        textureId: textureId,
+        enabled: enabled ? 1 : 0
     ));
   }
 
@@ -199,7 +196,7 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
   }
 
   static const Map<VideoFormat, String> _videoFormatStringMap =
-      <VideoFormat, String>{
+  <VideoFormat, String>{
     VideoFormat.ss: 'ss',
     VideoFormat.hls: 'hls',
     VideoFormat.dash: 'dash',
