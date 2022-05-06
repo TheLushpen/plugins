@@ -106,8 +106,7 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   }
 
   /// Sets the setPictureInPictureVideo.
-  Future<void> setPictureInPicture(int textureId, bool enabled, double left,
-      double top, double width, double height) {
+  Future<void> setPictureInPicture(int textureId, bool enabled) {
     throw UnimplementedError(
         'setPictureInPictureVideo() has not been implemented.');
   }

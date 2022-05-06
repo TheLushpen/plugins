@@ -61,6 +61,10 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
       uri: uri,
       httpHeaders: httpHeaders,
       formatHint: formatHint,
+      left: left,
+      top: top,
+      width: width,
+      height: height,
     );
 
     final TextureMessage response = await _api.create(message);
@@ -183,6 +187,11 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
       width: width,
       height: height,
     ));
+  }
+
+  @override
+  Future<void> showAirPlayMenu(int textureId) {
+    return _api.showAirPlayMenu(TextureMessage(textureId: textureId));
   }
 
   EventChannel _eventChannelFor(int textureId) {

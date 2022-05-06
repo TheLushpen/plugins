@@ -138,14 +138,22 @@ class CreateMessage {
     this.uri,
     this.packageName,
     this.formatHint,
-    required this.httpHeaders,
+    this.httpHeaders,
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
   });
 
   String? asset;
   String? uri;
   String? packageName;
   String? formatHint;
-  Map<String?, String?> httpHeaders;
+  Map<String?, String?>? httpHeaders;
+  double left;
+  double top;
+  double width;
+  double height;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
@@ -154,6 +162,10 @@ class CreateMessage {
     pigeonMap['packageName'] = packageName;
     pigeonMap['formatHint'] = formatHint;
     pigeonMap['httpHeaders'] = httpHeaders;
+    pigeonMap['left'] = left;
+    pigeonMap['top'] = top;
+    pigeonMap['width'] = width;
+    pigeonMap['height'] = height;
     return pigeonMap;
   }
 
@@ -164,7 +176,11 @@ class CreateMessage {
       uri: pigeonMap['uri'] as String?,
       packageName: pigeonMap['packageName'] as String?,
       formatHint: pigeonMap['formatHint'] as String?,
-      httpHeaders: (pigeonMap['httpHeaders'] as Map<Object?, Object?>?)!.cast<String?, String?>(),
+      httpHeaders: (pigeonMap['httpHeaders'] as Map<Object?, Object?>?)?.cast<String?, String?>(),
+      left: pigeonMap['left']! as double,
+      top: pigeonMap['top']! as double,
+      width: pigeonMap['width']! as double,
+      height: pigeonMap['height']! as double,
     );
   }
 }
@@ -572,6 +588,28 @@ class AndroidVideoPlayerApi {
         'dev.flutter.pigeon.AndroidVideoPlayerApi.setPictureInPicture', codec, binaryMessenger: _binaryMessenger);
     final Map<Object?, Object?>? replyMap =
         await channel.send(<Object?>[arg_arg]) as Map<Object?, Object?>?;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object?, Object?> error = (replyMap['error'] as Map<Object?, Object?>?)!;
+      throw PlatformException(
+        code: (error['code'] as String?)!,
+        message: error['message'] as String?,
+        details: error['details'],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> showAirPlayMenu(TextureMessage arg_msg) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.AndroidVideoPlayerApi.showAirPlayMenu', codec, binaryMessenger: _binaryMessenger);
+    final Map<Object?, Object?>? replyMap =
+        await channel.send(<Object?>[arg_msg]) as Map<Object?, Object?>?;
     if (replyMap == null) {
       throw PlatformException(
         code: 'channel-error',

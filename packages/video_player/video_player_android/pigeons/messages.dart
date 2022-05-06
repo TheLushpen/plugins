@@ -43,12 +43,17 @@ class PositionMessage {
 }
 
 class CreateMessage {
-  CreateMessage({required this.httpHeaders});
+  CreateMessage(this.left, this.top, this.width, this.height);
+
   String? asset;
   String? uri;
   String? packageName;
   String? formatHint;
-  Map<String?, String?> httpHeaders;
+  Map<String?, String?>? httpHeaders;
+  final double left;
+  final double top;
+  final double width;
+  final double height;
 }
 
 class MixWithOthersMessage {
@@ -88,4 +93,5 @@ abstract class AndroidVideoPlayerApi {
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);
   void setPictureInPicture(PictureInPictureMessage arg);
+  void showAirPlayMenu(TextureMessage msg);
 }

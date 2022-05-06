@@ -60,18 +60,10 @@ class PictureInPictureMessage {
   PictureInPictureMessage({
     required this.textureId,
     required this.enabled,
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
   });
 
   final int textureId;
   final int enabled;
-  final double left;
-  final double top;
-  final double width;
-  final double height;
 }
 
 @HostApi(dartHostTestHandler: 'TestHostVideoPlayerApi')

@@ -102,6 +102,7 @@ abstract class TestHostVideoPlayerApi {
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);
   void setPictureInPicture(PictureInPictureMessage arg);
+  void showAirPlayMenu(TextureMessage msg);
   static void setup(TestHostVideoPlayerApi? api, {BinaryMessenger? binaryMessenger}) {
     {
       final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
@@ -288,6 +289,22 @@ abstract class TestHostVideoPlayerApi {
           final PictureInPictureMessage? arg_arg = (args[0] as PictureInPictureMessage?);
           assert(arg_arg != null, 'Argument for dev.flutter.pigeon.AndroidVideoPlayerApi.setPictureInPicture was null, expected non-null PictureInPictureMessage.');
           api.setPictureInPicture(arg_arg!);
+          return <Object?, Object?>{};
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.AndroidVideoPlayerApi.showAirPlayMenu', codec, binaryMessenger: binaryMessenger);
+      if (api == null) {
+        channel.setMockMessageHandler(null);
+      } else {
+        channel.setMockMessageHandler((Object? message) async {
+          assert(message != null, 'Argument for dev.flutter.pigeon.AndroidVideoPlayerApi.showAirPlayMenu was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final TextureMessage? arg_msg = (args[0] as TextureMessage?);
+          assert(arg_msg != null, 'Argument for dev.flutter.pigeon.AndroidVideoPlayerApi.showAirPlayMenu was null, expected non-null TextureMessage.');
+          api.showAirPlayMenu(arg_msg!);
           return <Object?, Object?>{};
         });
       }

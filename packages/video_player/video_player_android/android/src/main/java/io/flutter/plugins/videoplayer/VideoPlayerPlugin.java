@@ -15,6 +15,12 @@ import android.util.Rational;
 
 import androidx.annotation.NonNull;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+
 import io.flutter.FlutterInjector;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -31,10 +37,6 @@ import io.flutter.plugins.videoplayer.Messages.PositionMessage;
 import io.flutter.plugins.videoplayer.Messages.TextureMessage;
 import io.flutter.plugins.videoplayer.Messages.VolumeMessage;
 import io.flutter.view.TextureRegistry;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import javax.net.ssl.HttpsURLConnection;
 
 /** Android platform implementation of the VideoPlayerPlugin. */
 public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, ActivityAware {
@@ -169,14 +171,53 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
     }
     videoPlayers.put(handle.id(), player);
 
+    setupPictureInPictureProperties(arg);
+
     TextureMessage result = new TextureMessage.Builder().setTextureId(handle.id()).build();
     return result;
+  }
+
+  private void setupPictureInPictureProperties(CreateMessage arg) {
+    try {
+      double density = flutterState.applicationContext.getResources().getDisplayMetrics().density;
+      double left = arg.getLeft() * density;
+      double top = arg.getTop() * density;
+      double right = left + arg.getWidth() * density;
+      double bottom = top + arg.getHeight() * density;
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        PictureInPictureParams.Builder params = new PictureInPictureParams.Builder()
+                .setAspectRatio(new Rational(arg.getWidth().intValue(),
+                        arg.getHeight().intValue()))
+                .setSourceRectHint(new Rect((int) left,
+                        (int) top,
+                        (int) right,
+                        (int) bottom));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+          params.setAutoEnterEnabled(true);
+        }
+
+        if (activity != null) {
+          activity.setPictureInPictureParams(params.build());
+        }
+      }
+    } catch (Exception error) {
+      error.printStackTrace();
+    }
   }
 
   public void dispose(TextureMessage arg) {
     VideoPlayer player = videoPlayers.get(arg.getTextureId());
     player.dispose();
     videoPlayers.remove(arg.getTextureId());
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      if (activity != null) {
+        activity.setPictureInPictureParams(new PictureInPictureParams.Builder()
+                .build());
+      }
+    }
   }
 
   public void setLooping(LoopingMessage arg) {
@@ -225,32 +266,38 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
     options.mixWithOthers = arg.getMixWithOthers();
   }
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public void setPictureInPicture(@NonNull Messages.PictureInPictureMessage arg) {
-        if (Build.VERSION.SDK_INT >= 24) {
-            if (Build.VERSION.SDK_INT >= 26) {
-                double density = flutterState.applicationContext.getResources().getDisplayMetrics().density;
-                double left = arg.getLeft() * density;
-                double top = arg.getTop() * density;
-                double right = left + arg.getWidth() * density;
-                double bottom = top + arg.getHeight() * density;
+  @Override
+  @SuppressWarnings("deprecation")
+  public void setPictureInPicture(@NonNull Messages.PictureInPictureMessage arg) {
+      if (Build.VERSION.SDK_INT >= 24) {
+          if (Build.VERSION.SDK_INT >= 26) {
+              double density = flutterState.applicationContext.getResources().getDisplayMetrics().density;
+              double left = arg.getLeft() * density;
+              double top = arg.getTop() * density;
+              double right = left + arg.getWidth() * density;
+              double bottom = top + arg.getHeight() * density;
 
-                PictureInPictureParams params = new PictureInPictureParams.Builder()
-                        .setAspectRatio(new Rational(arg.getWidth().intValue(),
-                                arg.getHeight().intValue()))
-                        .setSourceRectHint(new Rect((int) left,
-                                (int) top,
-                                (int) right,
-                                (int) bottom))
-                        .build();
+              PictureInPictureParams params = new PictureInPictureParams.Builder()
+                      .setAspectRatio(new Rational(arg.getWidth().intValue(),
+                              arg.getHeight().intValue()))
+                      .setSourceRectHint(new Rect((int) left,
+                              (int) top,
+                              (int) right,
+                              (int) bottom))
+                      .build();
 
-                activity.enterPictureInPictureMode(params);
-            } else {
-                activity.enterPictureInPictureMode();
-            }
-        }
-    }
+              activity.enterPictureInPictureMode(params);
+          } else {
+              activity.enterPictureInPictureMode();
+          }
+      }
+  }
+
+  @Override
+  public void showAirPlayMenu(@NonNull TextureMessage msg) {
+
+  }
+
 
   private interface KeyForAssetFn {
     String get(String asset);
@@ -295,25 +342,25 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
   }
 
   @Override
-    public void onDetachedFromActivityForConfigChanges() {
-    }
+  public void onDetachedFromActivityForConfigChanges() {
+  }
 
-    @Override
-    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-        this.activity = (FlutterActivity) binding.getActivity();
-    }
+  @Override
+  public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+      this.activity = (FlutterActivity) binding.getActivity();
+  }
 
-    @Override
-    public void onDetachedFromActivity() {
-    }
+  @Override
+  public void onDetachedFromActivity() {
+  }
 
-    public static void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
-        if (onPictureInPictureModeChanged != null) {
-            onPictureInPictureModeChanged.onChanged(isInPictureInPictureMode, newConfig);
-        }
-    }
+  public static void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+      if (onPictureInPictureModeChanged != null) {
+          onPictureInPictureModeChanged.onChanged(isInPictureInPictureMode, newConfig);
+      }
+  }
 
-    interface OnPictureInPictureModeChanged {
-        void onChanged(boolean isInPictureInPictureMode, Configuration newConfig);
-    }
+  interface OnPictureInPictureModeChanged {
+      void onChanged(boolean isInPictureInPictureMode, Configuration newConfig);
+  }
 }

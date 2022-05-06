@@ -313,13 +313,46 @@ public class Messages {
       this.formatHint = setterArg;
     }
 
-    private @NonNull Map<String, String> httpHeaders;
-    public @NonNull Map<String, String> getHttpHeaders() { return httpHeaders; }
-    public void setHttpHeaders(@NonNull Map<String, String> setterArg) {
-      if (setterArg == null) {
-        throw new IllegalStateException("Nonnull field \"httpHeaders\" is null.");
-      }
+    private @Nullable Map<String, String> httpHeaders;
+    public @Nullable Map<String, String> getHttpHeaders() { return httpHeaders; }
+    public void setHttpHeaders(@Nullable Map<String, String> setterArg) {
       this.httpHeaders = setterArg;
+    }
+
+    private @NonNull Double left;
+    public @NonNull Double getLeft() { return left; }
+    public void setLeft(@NonNull Double setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"left\" is null.");
+      }
+      this.left = setterArg;
+    }
+
+    private @NonNull Double top;
+    public @NonNull Double getTop() { return top; }
+    public void setTop(@NonNull Double setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"top\" is null.");
+      }
+      this.top = setterArg;
+    }
+
+    private @NonNull Double width;
+    public @NonNull Double getWidth() { return width; }
+    public void setWidth(@NonNull Double setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"width\" is null.");
+      }
+      this.width = setterArg;
+    }
+
+    private @NonNull Double height;
+    public @NonNull Double getHeight() { return height; }
+    public void setHeight(@NonNull Double setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"height\" is null.");
+      }
+      this.height = setterArg;
     }
 
     /** Constructor is private to enforce null safety; use Builder. */
@@ -346,8 +379,28 @@ public class Messages {
         return this;
       }
       private @Nullable Map<String, String> httpHeaders;
-      public @NonNull Builder setHttpHeaders(@NonNull Map<String, String> setterArg) {
+      public @NonNull Builder setHttpHeaders(@Nullable Map<String, String> setterArg) {
         this.httpHeaders = setterArg;
+        return this;
+      }
+      private @Nullable Double left;
+      public @NonNull Builder setLeft(@NonNull Double setterArg) {
+        this.left = setterArg;
+        return this;
+      }
+      private @Nullable Double top;
+      public @NonNull Builder setTop(@NonNull Double setterArg) {
+        this.top = setterArg;
+        return this;
+      }
+      private @Nullable Double width;
+      public @NonNull Builder setWidth(@NonNull Double setterArg) {
+        this.width = setterArg;
+        return this;
+      }
+      private @Nullable Double height;
+      public @NonNull Builder setHeight(@NonNull Double setterArg) {
+        this.height = setterArg;
         return this;
       }
       public @NonNull CreateMessage build() {
@@ -357,6 +410,10 @@ public class Messages {
         pigeonReturn.setPackageName(packageName);
         pigeonReturn.setFormatHint(formatHint);
         pigeonReturn.setHttpHeaders(httpHeaders);
+        pigeonReturn.setLeft(left);
+        pigeonReturn.setTop(top);
+        pigeonReturn.setWidth(width);
+        pigeonReturn.setHeight(height);
         return pigeonReturn;
       }
     }
@@ -367,6 +424,10 @@ public class Messages {
       toMapResult.put("packageName", packageName);
       toMapResult.put("formatHint", formatHint);
       toMapResult.put("httpHeaders", httpHeaders);
+      toMapResult.put("left", left);
+      toMapResult.put("top", top);
+      toMapResult.put("width", width);
+      toMapResult.put("height", height);
       return toMapResult;
     }
     static @NonNull CreateMessage fromMap(@NonNull Map<String, Object> map) {
@@ -381,6 +442,14 @@ public class Messages {
       pigeonResult.setFormatHint((String)formatHint);
       Object httpHeaders = map.get("httpHeaders");
       pigeonResult.setHttpHeaders((Map<String, String>)httpHeaders);
+      Object left = map.get("left");
+      pigeonResult.setLeft((Double)left);
+      Object top = map.get("top");
+      pigeonResult.setTop((Double)top);
+      Object width = map.get("width");
+      pigeonResult.setWidth((Double)width);
+      Object height = map.get("height");
+      pigeonResult.setHeight((Double)height);
       return pigeonResult;
     }
   }
@@ -639,6 +708,7 @@ public class Messages {
     void pause(@NonNull TextureMessage msg);
     void setMixWithOthers(@NonNull MixWithOthersMessage msg);
     void setPictureInPicture(@NonNull PictureInPictureMessage arg);
+    void showAirPlayMenu(@NonNull TextureMessage msg);
 
     /** The codec used by AndroidVideoPlayerApi. */
     static MessageCodec<Object> getCodec() {
@@ -919,6 +989,30 @@ public class Messages {
                 throw new NullPointerException("argArg unexpectedly null.");
               }
               api.setPictureInPicture(argArg);
+              wrapped.put("result", null);
+            }
+            catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.showAirPlayMenu", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              ArrayList<Object> args = (ArrayList<Object>)message;
+              TextureMessage msgArg = (TextureMessage)args.get(0);
+              if (msgArg == null) {
+                throw new NullPointerException("msgArg unexpectedly null.");
+              }
+              api.showAirPlayMenu(msgArg);
               wrapped.put("result", null);
             }
             catch (Error | RuntimeException exception) {
