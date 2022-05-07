@@ -84,11 +84,16 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
   ) async {}
 
   @override
-  Future<void> setPIP(bool enabled,
-      {double left = 0.0,
-      double top = 0.0,
-      double width = 0.0,
-      double height = 0.0}) async {}
+  Future<void> setPictureInPicture(bool enabled) {
+    // TODO: implement setPictureInPicture
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> showAirPlayMenu() {
+    // TODO: implement showAirPlayMenu
+    throw UnimplementedError();
+  }
 }
 
 Future<ClosedCaptionFile> _loadClosedCaption() async =>

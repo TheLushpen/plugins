@@ -137,6 +137,7 @@ class AndroidVideoPlayer extends VideoPlayerPlatform {
             size: Size((map['width'] as num?)?.toDouble() ?? 0.0,
                 (map['height'] as num?)?.toDouble() ?? 0.0),
             pipEnable: map['pipEnable'] as bool? ?? false,
+            castEnable: map['castEnable'] as bool? ?? false,
           );
         case 'completed':
           return VideoEvent(
