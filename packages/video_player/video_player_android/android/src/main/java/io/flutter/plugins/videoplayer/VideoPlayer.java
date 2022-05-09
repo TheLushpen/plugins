@@ -7,6 +7,7 @@ package io.flutter.plugins.videoplayer;
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_ALL;
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
 
+import android.app.Activity;
 import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -46,7 +47,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.view.TextureRegistry;
 
@@ -68,7 +68,7 @@ final class VideoPlayer {
     private boolean isInitialized = false;
 
     private Rect bounds;
-    private final FlutterActivity activity;
+    private final Activity activity;
 
     VideoPlayer(
             EventChannel eventChannel,
@@ -77,7 +77,7 @@ final class VideoPlayer {
             String formatHint,
             Map<String, String> httpHeaders,
             VideoPlayerOptions options,
-            FlutterActivity activity,
+            Activity activity,
             Rect bounds) {
         this.eventChannel = eventChannel;
         this.textureEntry = textureEntry;

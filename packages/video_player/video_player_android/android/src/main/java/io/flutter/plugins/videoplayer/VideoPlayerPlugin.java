@@ -4,7 +4,7 @@
 
 package io.flutter.plugins.videoplayer;
 
-import android.app.PictureInPictureParams;
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Build;
@@ -19,7 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.HttpsURLConnection;
 
 import io.flutter.FlutterInjector;
-import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -48,7 +47,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
     private final LongSparseArray<VideoPlayer> videoPlayers = new LongSparseArray<>();
 
     private FlutterState flutterState;
-    private FlutterActivity activity;
+    private Activity activity;
 
     /**
      * Register this with the v2 embedding for the plugin to respond to lifecycle callbacks.
@@ -285,7 +284,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-        this.activity = (FlutterActivity) binding.getActivity();
+        this.activity = binding.getActivity();
     }
 
     @Override
@@ -294,7 +293,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
 
     @Override
     public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-        this.activity = (FlutterActivity) binding.getActivity();
+        this.activity = binding.getActivity();
     }
 
     @Override
