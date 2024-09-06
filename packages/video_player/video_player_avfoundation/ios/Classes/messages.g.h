@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class FLTPlaybackSpeedMessage;
 @class FLTPositionMessage;
 @class FLTCreateMessage;
+@class FLTAudioMessage;
 @class FLTMixWithOthersMessage;
 @class FLTPictureInPictureMessage;
 
@@ -93,6 +94,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong) NSNumber * mixWithOthers;
 @end
 
+@interface FLTAudioMessage : NSObject
+@property(nonatomic, strong, nullable) NSNumber * textureId;
+@property(nonatomic, strong, nullable) NSArray * audios;
+@property(nonatomic, strong, nullable) NSNumber * index;
+@end
+
 @interface FLTPictureInPictureMessage : NSObject
 /// `init` unavailable to enforce nonnull fields, see the `make` class method.
 - (instancetype)init NS_UNAVAILABLE;
@@ -117,6 +124,9 @@ NSObject<FlutterMessageCodec> *FLTAVFoundationVideoPlayerApiGetCodec(void);
 /// @return `nil` only when `error != nil`.
 - (nullable FLTPositionMessage *)position:(FLTTextureMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)seekTo:(FLTPositionMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)setAudio:(FLTAudioMessage*)input error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)setAudioByIndex:(FLTAudioMessage*)input error:(FlutterError *_Nullable *_Nonnull)error;
+- (nullable FLTAudioMessage *)getAudios:(FLTTextureMessage*)input error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)pause:(FLTTextureMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)setMixWithOthers:(FLTMixWithOthersMessage *)msg error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)setPictureInPicture:(FLTPictureInPictureMessage *)arg error:(FlutterError *_Nullable *_Nonnull)error;

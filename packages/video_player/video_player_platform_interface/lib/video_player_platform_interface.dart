@@ -85,6 +85,18 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
     throw UnimplementedError('seekTo() has not been implemented.');
   }
 
+  Future<List<dynamic>> getAudios(int textureId) async {
+    throw UnimplementedError('getAudios() has not been implemented.');
+  }
+
+  Future<void> setAudioByIndex(int textureId, int index) async {
+    throw UnimplementedError('setAudioByIndex() has not been implemented.');
+  }
+
+  Future<void> setAudio(int textureId, String audio) async {
+    throw UnimplementedError('setAudio() has not been implemented.');
+  }
+
   /// Sets the playback speed to a [speed] value indicating the playback rate.
   Future<void> setPlaybackSpeed(int textureId, double speed) {
     throw UnimplementedError('setPlaybackSpeed() has not been implemented.');
@@ -269,8 +281,7 @@ class VideoEvent {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(
+  int get hashCode => Object.hash(
         eventType,
         duration,
         size,
@@ -373,10 +384,10 @@ class DurationRange {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is DurationRange &&
-              runtimeType == other.runtimeType &&
-              start == other.start &&
-              end == other.end;
+      other is DurationRange &&
+          runtimeType == other.runtimeType &&
+          start == other.start &&
+          end == other.end;
 
   @override
   int get hashCode => Object.hash(start, end);

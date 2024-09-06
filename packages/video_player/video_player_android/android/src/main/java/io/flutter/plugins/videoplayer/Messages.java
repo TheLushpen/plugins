@@ -454,6 +454,38 @@ public class Messages {
     }
   }
 
+  public static class AudioMessage {
+    private Long textureId;
+    public Long getTextureId() { return textureId; }
+    public void setTextureId(Long setterArg) { this.textureId = setterArg; }
+
+    private ArrayList audios;
+    public ArrayList getAudios() { return audios; }
+    public void setAudios(ArrayList setterArg) { this.audios = setterArg; }
+
+    private Long index;
+    public Long getIndex() { return index; }
+    public void setIndex(Long setterArg) { this.index = setterArg; }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("textureId", textureId);
+      toMapResult.put("audios", audios);
+      toMapResult.put("index", index);
+      return toMapResult;
+    }
+    static AudioMessage fromMap(HashMap map) {
+      AudioMessage fromMapResult = new AudioMessage();
+      Object textureId = map.get("textureId");
+      fromMapResult.textureId = (textureId == null) ? null : ((textureId instanceof Integer) ? (Integer)textureId : (Long)textureId);
+      Object audios = map.get("audios");
+      fromMapResult.audios = (ArrayList)audios;
+      Object index = map.get("index");
+      fromMapResult.index = (index == null) ? null : ((index instanceof Integer) ? (Integer)index : (Long)index);
+      return fromMapResult;
+    }
+  }
+
   /** Generated class from Pigeon that represents data sent in messages. */
   public static class MixWithOthersMessage {
     private @NonNull Boolean mixWithOthers;
@@ -553,33 +585,33 @@ public class Messages {
     @Override
     protected Object readValueOfType(byte type, ByteBuffer buffer) {
       switch (type) {
-        case (byte)128:         
+        case (byte)128:
           return CreateMessage.fromMap((Map<String, Object>) readValue(buffer));
-        
-        case (byte)129:         
+
+        case (byte)129:
           return LoopingMessage.fromMap((Map<String, Object>) readValue(buffer));
-        
-        case (byte)130:         
+
+        case (byte)130:
           return MixWithOthersMessage.fromMap((Map<String, Object>) readValue(buffer));
-        
-        case (byte)131:         
+
+        case (byte)131:
           return PictureInPictureMessage.fromMap((Map<String, Object>) readValue(buffer));
-        
-        case (byte)132:         
+
+        case (byte)132:
           return PlaybackSpeedMessage.fromMap((Map<String, Object>) readValue(buffer));
-        
-        case (byte)133:         
+
+        case (byte)133:
           return PositionMessage.fromMap((Map<String, Object>) readValue(buffer));
-        
-        case (byte)134:         
+
+        case (byte)134:
           return TextureMessage.fromMap((Map<String, Object>) readValue(buffer));
-        
-        case (byte)135:         
+
+        case (byte)135:
           return VolumeMessage.fromMap((Map<String, Object>) readValue(buffer));
-        
-        default:        
+
+        default:
           return super.readValueOfType(type, buffer);
-        
+
       }
     }
     @Override
@@ -587,35 +619,35 @@ public class Messages {
       if (value instanceof CreateMessage) {
         stream.write(128);
         writeValue(stream, ((CreateMessage) value).toMap());
-      } else 
+      } else
       if (value instanceof LoopingMessage) {
         stream.write(129);
         writeValue(stream, ((LoopingMessage) value).toMap());
-      } else 
+      } else
       if (value instanceof MixWithOthersMessage) {
         stream.write(130);
         writeValue(stream, ((MixWithOthersMessage) value).toMap());
-      } else 
+      } else
       if (value instanceof PictureInPictureMessage) {
         stream.write(131);
         writeValue(stream, ((PictureInPictureMessage) value).toMap());
-      } else 
+      } else
       if (value instanceof PlaybackSpeedMessage) {
         stream.write(132);
         writeValue(stream, ((PlaybackSpeedMessage) value).toMap());
-      } else 
+      } else
       if (value instanceof PositionMessage) {
         stream.write(133);
         writeValue(stream, ((PositionMessage) value).toMap());
-      } else 
+      } else
       if (value instanceof TextureMessage) {
         stream.write(134);
         writeValue(stream, ((TextureMessage) value).toMap());
-      } else 
+      } else
       if (value instanceof VolumeMessage) {
         stream.write(135);
         writeValue(stream, ((VolumeMessage) value).toMap());
-      } else 
+      } else
 {
         super.writeValue(stream, value);
       }
@@ -633,6 +665,9 @@ public class Messages {
     void play(@NonNull TextureMessage msg);
     @NonNull PositionMessage position(@NonNull TextureMessage msg);
     void seekTo(@NonNull PositionMessage msg);
+    void setAudio(AudioMessage arg);
+    void setAudioByIndex(AudioMessage arg);
+    AudioMessage getAudios(TextureMessage arg);
     void pause(@NonNull TextureMessage msg);
     void setMixWithOthers(@NonNull MixWithOthersMessage msg);
     void setPictureInPicture(@NonNull PictureInPictureMessage arg);
@@ -848,6 +883,66 @@ public class Messages {
               wrapped.put("result", null);
             }
             catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+                new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.setAudio", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              @SuppressWarnings("ConstantConditions")
+              AudioMessage input = AudioMessage.fromMap((HashMap) message);
+              api.setAudio(input);
+              wrapped.put("result", null);
+            } catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+                new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.setAudioByIndex", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              @SuppressWarnings("ConstantConditions")
+              AudioMessage input = AudioMessage.fromMap((HashMap) message);
+              api.setAudioByIndex(input);
+              wrapped.put("result", null);
+            } catch (Error | RuntimeException exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+                new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.getAudios", getCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            Map<String, Object> wrapped = new HashMap<>();
+            try {
+              @SuppressWarnings("ConstantConditions")
+              TextureMessage input = TextureMessage.fromMap((HashMap) message);
+              AudioMessage output = api.getAudios(input);
+              wrapped.put("result", output.toMap());
+            } catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));
             }
             reply.reply(wrapped);

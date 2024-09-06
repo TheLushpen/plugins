@@ -31,6 +31,7 @@ import io.flutter.plugins.videoplayer.Messages.MixWithOthersMessage;
 import io.flutter.plugins.videoplayer.Messages.PictureInPictureMessage;
 import io.flutter.plugins.videoplayer.Messages.PlaybackSpeedMessage;
 import io.flutter.plugins.videoplayer.Messages.PositionMessage;
+import io.flutter.plugins.videoplayer.Messages.AudioMessage;
 import io.flutter.plugins.videoplayer.Messages.TextureMessage;
 import io.flutter.plugins.videoplayer.Messages.VolumeMessage;
 import io.flutter.view.TextureRegistry;
@@ -183,6 +184,22 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi, 
             return arg.getUri();
         }
     }
+
+    public AudioMessage getAudios(TextureMessage arg) {
+        VideoPlayer player = videoPlayers.get(arg.getTextureId());
+        AudioMessage result = new AudioMessage();
+        result.setAudios(player.getAudios());
+        return result;
+    }
+    public void setAudio(AudioMessage arg) {
+        VideoPlayer player = videoPlayers.get(arg.getTextureId());
+        player.setAudio(arg.getAudios().get(0).toString());
+    }
+    public void setAudioByIndex(AudioMessage arg) {
+        VideoPlayer player = videoPlayers.get(arg.getTextureId());
+        player.setAudioByIndex(arg.getIndex().intValue());
+    }
+
 
     public void dispose(TextureMessage arg) {
         VideoPlayer player = videoPlayers.get(arg.getTextureId());

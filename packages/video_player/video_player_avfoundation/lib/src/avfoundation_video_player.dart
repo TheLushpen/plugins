@@ -117,6 +117,23 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
+  Future<List<dynamic>> getAudios(int textureId) async {
+    return _api
+        .getAudios(TextureMessage(textureId: textureId))
+        .then((AudioMessage result) => result.audios!);
+  }
+
+  @override
+  Future<void> setAudioByIndex(int textureId, int index) async {
+    return _api.setAudioByIndex(AudioMessage(textureId: textureId, index: index));
+  }
+
+  @override
+  Future<void> setAudio(int textureId, String audio) async {
+    return _api.setAudio(AudioMessage(textureId: textureId, audios: [audio]));
+  }
+
+  @override
   Future<Duration> getPosition(int textureId) async {
     final PositionMessage response =
     await _api.position(TextureMessage(textureId: textureId));

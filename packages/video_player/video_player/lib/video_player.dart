@@ -61,9 +61,9 @@ class VideoPlayerValue {
   /// Returns an instance with the given [errorDescription].
   VideoPlayerValue.erroneous(String errorDescription)
       : this(
-      duration: Duration.zero,
-      isInitialized: false,
-      errorDescription: errorDescription);
+            duration: Duration.zero,
+            isInitialized: false,
+            errorDescription: errorDescription);
 
   /// This constant is just to indicate that parameter is not passed to [copyWith]
   /// workaround for this issue https://github.com/dart-lang/language/issues/2009
@@ -230,8 +230,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// package and null otherwise.
   VideoPlayerController.asset(this.dataSource,
       {this.package,
-        Future<ClosedCaptionFile>? closedCaptionFile,
-        this.videoPlayerOptions})
+      Future<ClosedCaptionFile>? closedCaptionFile,
+      this.videoPlayerOptions})
       : _closedCaptionFileFuture = closedCaptionFile,
         dataSourceType = DataSourceType.asset,
         formatHint = null,
@@ -247,13 +247,13 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// the video format detection code.
   /// [httpHeaders] option allows to specify HTTP headers
   /// for the request to the [dataSource].
-  VideoPlayerController.network(this.dataSource, {
+  VideoPlayerController.network(
+    this.dataSource, {
     this.formatHint,
     Future<ClosedCaptionFile>? closedCaptionFile,
     this.videoPlayerOptions,
     this.httpHeaders = const <String, String>{},
-  })
-      : _closedCaptionFileFuture = closedCaptionFile,
+  })  : _closedCaptionFileFuture = closedCaptionFile,
         dataSourceType = DataSourceType.network,
         package = null,
         super(VideoPlayerValue(duration: Duration.zero));
@@ -279,7 +279,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   VideoPlayerController.contentUri(Uri contentUri,
       {Future<ClosedCaptionFile>? closedCaptionFile, this.videoPlayerOptions})
       : assert(defaultTargetPlatform == TargetPlatform.android,
-  'VideoPlayerController.contentUri is only supported on Android.'),
+            'VideoPlayerController.contentUri is only supported on Android.'),
         _closedCaptionFileFuture = closedCaptionFile,
         dataSource = contentUri.toString(),
         dataSourceType = DataSourceType.contentUri,
@@ -381,7 +381,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     }
 
     _textureId = (await _videoPlayerPlatform.create(
-        dataSourceDescription, left, top, width, height)) ??
+            dataSourceDescription, left, top, width, height)) ??
         kUninitializedTextureId;
     _creatingCompleter!.complete(null);
     final Completer<void> initializingCompleter = Completer<void>();
@@ -407,10 +407,10 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           _applyPlayPause();
           break;
         case VideoEventType.completed:
-        // In this case we need to stop _timer, set isPlaying=false, and
-        // position=value.duration. Instead of setting the values directly,
-        // we use pause() and seekTo() to ensure the platform stops playing
-        // and seeks to the last frame of the video.
+          // In this case we need to stop _timer, set isPlaying=false, and
+          // position=value.duration. Instead of setting the values directly,
+          // we use pause() and seekTo() to ensure the platform stops playing
+          // and seeks to the last frame of the video.
           pause().then((void pauseResult) => seekTo(value.duration));
           break;
         case VideoEventType.bufferingUpdate:
@@ -489,6 +489,18 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     await _applyPlayPause();
   }
 
+  Future<List<dynamic>> getAudios() async {
+    return _videoPlayerPlatform.getAudios(_textureId);
+  }
+
+  Future<void> setAudioByIndex(int index) async {
+    return _videoPlayerPlatform.setAudioByIndex(_textureId, index);
+  }
+
+  Future<void> setAudio(String audio) async {
+    return _videoPlayerPlatform.setAudio(_textureId, audio);
+  }
+
   /// Sets whether or not the video should loop after playing once. See also
   /// [VideoPlayerValue.isLooping].
   Future<void> setLooping(bool looping) async {
@@ -520,7 +532,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       _timer?.cancel();
       _timer = Timer.periodic(
         const Duration(milliseconds: 500),
-            (Timer timer) async {
+        (Timer timer) async {
           if (_isDisposed) {
             return;
           }
@@ -698,13 +710,15 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   ///
   /// If [closedCaptionFile] is null, closed captions will be removed.
   Future<void> setClosedCaptionFile(
-      Future<ClosedCaptionFile>? closedCaptionFile,) async {
+    Future<ClosedCaptionFile>? closedCaptionFile,
+  ) async {
     await _updateClosedCaptionWithFuture(closedCaptionFile);
     _closedCaptionFileFuture = closedCaptionFile;
   }
 
   Future<void> _updateClosedCaptionWithFuture(
-      Future<ClosedCaptionFile>? closedCaptionFile,) async {
+    Future<ClosedCaptionFile>? closedCaptionFile,
+  ) async {
     _closedCaptionFile = await closedCaptionFile;
     value = value.copyWith(caption: _getCaptionAt(value.position));
   }
@@ -854,7 +868,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     return _textureId == VideoPlayerController.kUninitializedTextureId ||
-        !_enabledVideo
+            !_enabledVideo
         ? Container()
         : _videoPlayerPlatform.buildView(_textureId);
   }
@@ -876,9 +890,11 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
-  Widget _fullScreenRoutePageBuilder(BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,) {
+  Widget _fullScreenRoutePageBuilder(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
     return _videoPlayerPlatform.buildView(_textureId);
   }
 }
@@ -999,7 +1015,8 @@ class VideoProgressIndicator extends StatefulWidget {
   /// Defaults will be used for everything except [controller] if they're not
   /// provided. [allowScrubbing] defaults to false, and [padding] will default
   /// to `top: 5.0`.
-  const VideoProgressIndicator(this.controller, {
+  const VideoProgressIndicator(
+    this.controller, {
     this.colors = const VideoProgressColors(),
     required this.allowScrubbing,
     this.padding = const EdgeInsets.only(top: 5.0),
@@ -1154,13 +1171,10 @@ class ClosedCaption extends StatelessWidget {
     }
 
     final TextStyle effectiveTextStyle = textStyle ??
-        DefaultTextStyle
-            .of(context)
-            .style
-            .copyWith(
-          fontSize: 36.0,
-          color: Colors.white,
-        );
+        DefaultTextStyle.of(context).style.copyWith(
+              fontSize: 36.0,
+              color: Colors.white,
+            );
 
     return Align(
       alignment: Alignment.bottomCenter,

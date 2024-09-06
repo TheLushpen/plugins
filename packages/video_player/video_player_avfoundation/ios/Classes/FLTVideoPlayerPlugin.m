@@ -804,6 +804,65 @@ NSMutableDictionary<NSNumber *, FLTVideoPlayer *> *playersByTextureId;
     }
 }
 
+- (FLTAudioMessage*)getAudios:(FLTTextureMessage*)input error:(FlutterError**)error{
+    FLTAudioMessage* result = [[FLTAudioMessage alloc] init];
+    FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
+    AVMediaSelectionGroup *audioSelectionGroup = [[[player.player currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
+
+    NSArray* x = audioSelectionGroup.options;
+    NSMutableArray* audios;
+    audios = [NSMutableArray array];
+
+    for(AVMediaSelectionOption* object in x)
+    {
+
+        [audios addObject: object.displayName];
+        //result.audioTypes =[NSString stringWithFormat: @"%@%@%@", result.audioTypes, object.extendedLanguageTag,@"\n"];
+    }
+    NSArray *array = [audios copy];
+    result.audios = array;
+
+
+    return result;
+
+}
+
+- (void)setAudioByIndex:(nonnull FLTAudioMessage *)input error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
+    FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
+    int index = [input.index intValue];
+    int i =0;
+
+    AVMediaSelectionGroup *audioSelectionGroup = [[[player.player currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
+    NSArray* x = audioSelectionGroup.options;
+
+    NSLog(@"options: %@", audioSelectionGroup.options);
+
+    for(AVMediaSelectionOption* object in x)
+    {
+
+        if(index == i)
+        {
+            NSLog(@"index: %d ", index);
+            [[player.player currentItem] selectMediaOption:object inMediaSelectionGroup: audioSelectionGroup];
+            break;
+
+        }
+        i+=1;
+    }
+}
+
+- (void)setAudio:(nonnull FLTAudioMessage *)input error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
+    FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
+    NSString* audioType = input.audios.firstObject;
+    AVMediaSelectionGroup *audioSelectionGroup = [[[player.player currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
+    NSArray* x = audioSelectionGroup.options;
+    for(AVMediaSelectionOption* object in x)
+    {
+        if([object.displayName isEqualToString:audioType] ==1)
+            [[player.player currentItem] selectMediaOption:object inMediaSelectionGroup: audioSelectionGroup];
+    }
+}
+
 - (void)setPictureInPicture:(FLTPictureInPictureMessage*)input error:(FlutterError**)error {
     FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
     [player setPictureInPicture: input.enabled.intValue == 1];

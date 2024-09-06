@@ -29,19 +29,29 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.Listener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.RendererCapabilities;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.ui.TrackNameProvider;
+import com.google.android.exoplayer2.ui.DefaultTrackNameProvider;
+import com.google.android.exoplayer2.source.TrackGroup;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +79,7 @@ final class VideoPlayer {
 
     private Rect bounds;
     private final Activity activity;
+    private final DefaultTrackSelector trackSelector;
 
     VideoPlayer(
             EventChannel eventChannel,
@@ -85,7 +96,8 @@ final class VideoPlayer {
         this.activity = activity;
         this.bounds = bounds;
 
-        exoPlayer = new ExoPlayer.Builder(activity).build();
+        trackSelector = new DefaultTrackSelector(activity);
+        exoPlayer = new ExoPlayer.Builder(activity).setTrackSelector(trackSelector).build();
 
         Uri uri = Uri.parse(dataSource);
         DataSource.Factory dataSourceFactory;
@@ -109,6 +121,142 @@ final class VideoPlayer {
 
         setupVideoPlayer(eventChannel, textureEntry);
     }
+
+    @SuppressWarnings("unchecked")
+    ArrayList<String> getAudios() {
+        MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+                trackSelector.getCurrentMappedTrackInfo();
+
+        ArrayList<String> audios = new ArrayList<>();
+
+        if (mappedTrackInfo == null) {
+            return audios;
+        }
+
+        for (int i = 0; i < mappedTrackInfo.getRendererCount(); i++) {
+            if (mappedTrackInfo.getRendererType(i) != C.TRACK_TYPE_AUDIO) {
+                continue;
+            }
+
+            TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+            for (int j = 0; j < trackGroupArray.length; j++) {
+                TrackGroup group = trackGroupArray.get(j);
+
+                for (int k = 0; k < group.length; k++) {
+                    // Проверка на поддержку трека
+                    if (mappedTrackInfo.getTrackSupport(i, j, k) == C.FORMAT_HANDLED) {
+                        // Формируем название трека на основе информации из Format
+                        Format format = group.getFormat(k);
+                        String trackName = getTrackName(format);
+                        audios.add(trackName);
+                    }
+                }
+            }
+        }
+        return audios;
+    }
+
+    void setAudio(String audioName) {
+        MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+                trackSelector.getCurrentMappedTrackInfo();
+
+        if (mappedTrackInfo == null) {
+            return;
+        }
+
+        for (int i = 0; i < mappedTrackInfo.getRendererCount(); i++) {
+            if (mappedTrackInfo.getRendererType(i) != C.TRACK_TYPE_AUDIO) {
+                continue;
+            }
+
+            TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+            for (int j = 0; j < trackGroupArray.length; j++) {
+                TrackGroup group = trackGroupArray.get(j);
+
+                for (int k = 0; k < group.length; k++) {
+                    // Получаем имя трека для сравнения
+                    Format format = group.getFormat(k);
+                    String trackName = getTrackName(format);
+
+                    if (trackName.equals(audioName)) {
+                        DefaultTrackSelector.ParametersBuilder builder = trackSelector.getParameters().buildUpon();
+
+                        // Очищаем предыдущие оверрайды для текущего рендера
+                        builder.clearSelectionOverride(i, trackGroupArray);
+
+                        // Включаем рендерер, если он был отключен
+                        builder.setRendererDisabled(i, false);
+
+                        // Устанавливаем новый оверрайд выбора трека (преобразуем список в int[])
+                        int[] tracks = {k};  // Прямо используем массив int[]
+                        builder.setSelectionOverride(i, trackGroupArray, new DefaultTrackSelector.SelectionOverride(j, tracks));
+
+                        // Применяем параметры
+                        trackSelector.setParameters(builder);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    void setAudioByIndex(int index) {
+        MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+                trackSelector.getCurrentMappedTrackInfo();
+
+        if (mappedTrackInfo == null) {
+            return;
+        }
+
+        int audioIndex = 0;
+
+        for (int i = 0; i < mappedTrackInfo.getRendererCount(); i++) {
+            if (mappedTrackInfo.getRendererType(i) != C.TRACK_TYPE_AUDIO) {
+                continue;
+            }
+
+            TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+            for (int j = 0; j < trackGroupArray.length; j++) {
+                TrackGroup group = trackGroupArray.get(j);
+
+                for (int k = 0; k < group.length; k++) {
+                    if (audioIndex == index) {
+                        DefaultTrackSelector.ParametersBuilder builder = trackSelector.getParameters().buildUpon();
+
+                        // Очищаем предыдущие оверрайды для текущего рендера
+                        builder.clearSelectionOverride(i, trackGroupArray);
+
+                        // Включаем рендерер, если он был отключен
+                        builder.setRendererDisabled(i, false);
+
+                        // Устанавливаем новый оверрайд выбора трека (преобразуем список в int[])
+                        int[] tracks = {k};  // Прямо используем массив int[]
+                        builder.setSelectionOverride(i, trackGroupArray, new DefaultTrackSelector.SelectionOverride(j, tracks));
+
+                        // Применяем параметры
+                        trackSelector.setParameters(builder);
+                        return;
+                    }
+                    audioIndex++;
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Пример метода для генерации названия трека на основе Format.
+     */
+    private String getTrackName(Format format) {
+        if (format.language != null) {
+            return format.language;  // Используем язык трека как его имя
+        } else if (format.sampleMimeType != null) {
+            return format.sampleMimeType;  // Используем MIME тип, если язык не доступен
+        } else {
+            return "Unknown";  // Если никакой информации нет
+        }
+    }
+
 
     private static boolean isHTTP(Uri uri) {
         if (uri == null || uri.getScheme() == null) {

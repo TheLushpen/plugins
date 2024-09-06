@@ -185,6 +185,34 @@ class CreateMessage {
   }
 }
 
+class AudioMessage {
+  int? textureId;
+  List? audios;
+  int? index;
+
+  AudioMessage({
+    this.textureId,
+    this.audios,
+    this.index,
+  });
+
+  Object encode() {
+    final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
+    pigeonMap['textureId'] = textureId;
+    pigeonMap['audios'] = audios;
+    pigeonMap['index'] = index;
+    return pigeonMap;
+  }
+
+  static AudioMessage decode(Object message) {
+    final Map<Object?, Object?> pigeonMap = message as Map<Object?, Object?>;
+    return AudioMessage()
+      ..textureId = pigeonMap['textureId'] as int?
+      ..audios = pigeonMap['audios'] as List?
+      ..index = pigeonMap['index'] as int?;
+  }
+}
+
 class MixWithOthersMessage {
   MixWithOthersMessage({
     required this.mixWithOthers,
@@ -238,35 +266,35 @@ class _AndroidVideoPlayerApiCodec extends StandardMessageCodec {
     if (value is CreateMessage) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else 
+    } else
     if (value is LoopingMessage) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else 
+    } else
     if (value is MixWithOthersMessage) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else 
+    } else
     if (value is PictureInPictureMessage) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else 
+    } else
     if (value is PlaybackSpeedMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else 
+    } else
     if (value is PositionMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    } else 
+    } else
     if (value is TextureMessage) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else 
+    } else
     if (value is VolumeMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else 
+    } else
 {
       super.writeValue(buffer, value);
     }
@@ -274,33 +302,33 @@ class _AndroidVideoPlayerApiCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128:       
+      case 128:
         return CreateMessage.decode(readValue(buffer)!);
-      
-      case 129:       
+
+      case 129:
         return LoopingMessage.decode(readValue(buffer)!);
-      
-      case 130:       
+
+      case 130:
         return MixWithOthersMessage.decode(readValue(buffer)!);
-      
-      case 131:       
+
+      case 131:
         return PictureInPictureMessage.decode(readValue(buffer)!);
-      
-      case 132:       
+
+      case 132:
         return PlaybackSpeedMessage.decode(readValue(buffer)!);
-      
-      case 133:       
+
+      case 133:
         return PositionMessage.decode(readValue(buffer)!);
-      
-      case 134:       
+
+      case 134:
         return TextureMessage.decode(readValue(buffer)!);
-      
-      case 135:       
+
+      case 135:
         return VolumeMessage.decode(readValue(buffer)!);
-      
-      default:      
+
+      default:
         return super.readValueOfType(type, buffer);
-      
+
     }
   }
 }
@@ -520,6 +548,84 @@ class AndroidVideoPlayerApi {
       );
     } else {
       return;
+    }
+  }
+
+  Future<void> setAudio(AudioMessage arg) async {
+    final Object encoded = arg.encode();
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.AndroidVideoPlayerApi.setAudio', codec,
+        binaryMessenger: _binaryMessenger);
+    final Map<Object?, Object?>? replyMap =
+        await channel.send(encoded) as Map<Object?, Object?>?;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null,
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object?, Object?> error =
+          replyMap['error'] as Map<Object?, Object?>;
+      throw PlatformException(
+        code: error['code'] as String,
+        message: error['message'] as String?,
+        details: error['details'],
+      );
+    } else {
+      // noop
+    }
+  }
+
+  Future<void> setAudioByIndex(AudioMessage arg) async {
+    final Object encoded = arg.encode();
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.AndroidVideoPlayerApi.setAudioByIndex', codec,
+        binaryMessenger: _binaryMessenger);
+    final Map<Object?, Object?>? replyMap =
+        await channel.send(encoded) as Map<Object?, Object?>?;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null,
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object?, Object?> error =
+          replyMap['error'] as Map<Object?, Object?>;
+      throw PlatformException(
+        code: error['code'] as String,
+        message: error['message'] as String?,
+        details: error['details'],
+      );
+    } else {
+      // noop
+    }
+  }
+
+  Future<AudioMessage> getAudios(TextureMessage arg) async {
+    final Object encoded = arg.encode();
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.AndroidVideoPlayerApi.getAudios', codec,
+        binaryMessenger: _binaryMessenger);
+    final Map<Object?, Object?>? replyMap =
+        await channel.send(encoded) as Map<Object?, Object?>?;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null,
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object?, Object?> error =
+          replyMap['error'] as Map<Object?, Object?>;
+      throw PlatformException(
+        code: error['code'] as String,
+        message: error['message'] as String?,
+        details: error['details'],
+      );
+    } else {
+      return AudioMessage.decode(replyMap['result']!);
     }
   }
 

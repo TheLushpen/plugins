@@ -58,6 +58,10 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 + (FLTCreateMessage *)fromMap:(NSDictionary *)dict;
 - (NSDictionary *)toMap;
 @end
+@interface FLTAudioMessage ()
++(FLTAudioMessage*)fromMap:(NSDictionary*)dict;
+-(NSDictionary*)toMap;
+@end
 @interface FLTMixWithOthersMessage ()
 + (FLTMixWithOthersMessage *)fromMap:(NSDictionary *)dict;
 - (NSDictionary *)toMap;
@@ -213,6 +217,29 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 }
 @end
 
+@implementation FLTAudioMessage
++(FLTAudioMessage*)fromMap:(NSDictionary*)dict {
+    FLTAudioMessage* result = [[FLTAudioMessage alloc] init];
+    result.textureId = dict[@"textureId"];
+    if ((NSNull *)result.textureId == [NSNull null]) {
+        result.textureId = nil;
+    }
+    result.audios = dict[@"audios"];
+    if ((NSNull *)result.audios == [NSNull null]) {
+        result.audios = nil;
+    }
+    result.index = dict[@"index"];
+    if ((NSNull *)result.index == [NSNull null]) {
+        result.index = nil;
+    }
+    return result;
+}
+-(NSDictionary*)toMap {
+    return [NSDictionary dictionaryWithObjectsAndKeys:(self.textureId ? self.textureId : [NSNull null]), @"textureId", (self.audios ? self.audios : [NSNull null]), @"audios", (self.index ? self.index : [NSNull null]), @"index", nil];
+}
+@end
+
+
 @implementation FLTMixWithOthersMessage
 + (instancetype)makeWithMixWithOthers:(NSNumber *)mixWithOthers {
   FLTMixWithOthersMessage* pigeonResult = [[FLTMixWithOthersMessage alloc] init];
@@ -254,36 +281,36 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 @interface FLTAVFoundationVideoPlayerApiCodecReader : FlutterStandardReader
 @end
 @implementation FLTAVFoundationVideoPlayerApiCodecReader
-- (nullable id)readValueOfType:(UInt8)type 
+- (nullable id)readValueOfType:(UInt8)type
 {
   switch (type) {
-    case 128:     
+    case 128:
       return [FLTCreateMessage fromMap:[self readValue]];
-    
-    case 129:     
+
+    case 129:
       return [FLTLoopingMessage fromMap:[self readValue]];
-    
-    case 130:     
+
+    case 130:
       return [FLTMixWithOthersMessage fromMap:[self readValue]];
-    
-    case 131:     
+
+    case 131:
       return [FLTPictureInPictureMessage fromMap:[self readValue]];
-    
-    case 132:     
+
+    case 132:
       return [FLTPlaybackSpeedMessage fromMap:[self readValue]];
-    
-    case 133:     
+
+    case 133:
       return [FLTPositionMessage fromMap:[self readValue]];
-    
-    case 134:     
+
+    case 134:
       return [FLTTextureMessage fromMap:[self readValue]];
-    
-    case 135:     
+
+    case 135:
       return [FLTVolumeMessage fromMap:[self readValue]];
-    
-    default:    
+
+    default:
       return [super readValueOfType:type];
-    
+
   }
 }
 @end
@@ -291,40 +318,40 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 @interface FLTAVFoundationVideoPlayerApiCodecWriter : FlutterStandardWriter
 @end
 @implementation FLTAVFoundationVideoPlayerApiCodecWriter
-- (void)writeValue:(id)value 
+- (void)writeValue:(id)value
 {
   if ([value isKindOfClass:[FLTCreateMessage class]]) {
     [self writeByte:128];
     [self writeValue:[value toMap]];
-  } else 
+  } else
   if ([value isKindOfClass:[FLTLoopingMessage class]]) {
     [self writeByte:129];
     [self writeValue:[value toMap]];
-  } else 
+  } else
   if ([value isKindOfClass:[FLTMixWithOthersMessage class]]) {
     [self writeByte:130];
     [self writeValue:[value toMap]];
-  } else 
+  } else
   if ([value isKindOfClass:[FLTPictureInPictureMessage class]]) {
     [self writeByte:131];
     [self writeValue:[value toMap]];
-  } else 
+  } else
   if ([value isKindOfClass:[FLTPlaybackSpeedMessage class]]) {
     [self writeByte:132];
     [self writeValue:[value toMap]];
-  } else 
+  } else
   if ([value isKindOfClass:[FLTPositionMessage class]]) {
     [self writeByte:133];
     [self writeValue:[value toMap]];
-  } else 
+  } else
   if ([value isKindOfClass:[FLTTextureMessage class]]) {
     [self writeByte:134];
     [self writeValue:[value toMap]];
-  } else 
+  } else
   if ([value isKindOfClass:[FLTVolumeMessage class]]) {
     [self writeByte:135];
     [self writeValue:[value toMap]];
-  } else 
+  } else
 {
     [super writeValue:value];
   }
@@ -532,6 +559,63 @@ void FLTAVFoundationVideoPlayerApiSetup(id<FlutterBinaryMessenger> binaryMesseng
       [channel setMessageHandler:nil];
     }
   }
+    {
+        FlutterBasicMessageChannel *channel =
+                [[FlutterBasicMessageChannel alloc]
+                        initWithName:@"dev.flutter.pigeon.AVFoundationVideoPlayerApi.setAudio"
+                     binaryMessenger:binaryMessenger
+                               codec:FLTAVFoundationVideoPlayerApiGetCodec()        ];
+        if (api) {
+            [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+                FlutterError *error;
+                FLTAudioMessage *input = [FLTAudioMessage fromMap:message];
+                [api setAudio:input error:&error];
+                callback(wrapResult(nil, error));
+            }];
+        }
+        else {
+            [channel setMessageHandler:nil];
+        }
+    }
+    {
+        FlutterBasicMessageChannel *channel =
+                [[FlutterBasicMessageChannel alloc]
+                        initWithName:@"dev.flutter.pigeon.AVFoundationVideoPlayerApi.setAudioByIndex"
+                     binaryMessenger:binaryMessenger
+                               codec:FLTAVFoundationVideoPlayerApiGetCodec()        ];
+        if (api) {
+            [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+                NSLog(@"Bind");
+                FlutterError *error;
+                FLTAudioMessage *input = [FLTAudioMessage fromMap:message];
+                [api setAudioByIndex:input error:&error];
+                callback(wrapResult(nil, error));
+            }];
+        }
+        else {
+            [channel setMessageHandler:nil];
+        }
+    }
+    {
+        FlutterBasicMessageChannel *channel =
+                [[FlutterBasicMessageChannel alloc]
+                        initWithName:@"dev.flutter.pigeon.AVFoundationVideoPlayerApi.getAudios"
+                     binaryMessenger:binaryMessenger
+                               codec:FLTAVFoundationVideoPlayerApiGetCodec()        ];
+        if (api) {
+            [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+                FlutterError *error;
+
+                NSLog(@"Get Audios");
+                FLTTextureMessage *input = [FLTTextureMessage fromMap:message];
+                FLTAudioMessage *output = [api getAudios:input error:&error];
+                callback(wrapResult([output toMap], error));
+            }];
+        }
+        else {
+            [channel setMessageHandler:nil];
+        }
+    }
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
